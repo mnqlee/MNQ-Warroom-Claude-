@@ -414,25 +414,29 @@ function renderSignal(){
 
 // ── LIVE TAB ──────────────────────────────────────────────────────────────────
 function renderLive(){
-  if(!state.dbConnected){
-    return '<div class="card"><div style="font-size:10px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:4px">[ANT] DATABENTO LIVE CHART</div><div style="font-size:8px;color:#444;margin-bottom:12px;line-height:1.7">Connect your Databento account for live MNQ candles - all timeframes, EMAs, VWAP, ORB, FVG detection and entry alerts.</div><div style="background:#00d4aa08;border:1px solid #00d4aa22;border-radius:6px;padding:10px 12px;margin-bottom:12px"><div style="font-size:8px;color:#00d4aa;font-weight:700;margin-bottom:6px">SETUP - 2 MINUTES</div><div style="font-size:8px;color:#555;line-height:1.8">1. Go to databento.com and sign up free ($125 credits)<br>2. Log in -> click your name -> API Keys<br>3. Create API Key -> copy it<br>4. Paste below and tap CONNECT</div></div><div style="margin-bottom:10px"><div style="font-size:7px;color:#444;margin-bottom:4px;letter-spacing:1px">DATABENTO API KEY</div><input id="dbKeyInput" type="password" value="'+state.dbKey+'" placeholder="db-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="width:100%;background:#111;border:1px solid #00d4aa33;color:#00d4aa;padding:9px 10px;border-radius:4px;font-size:10px;font-family:monospace" oninput="state.dbKey=this.value"/><div style="font-size:7px;color:#1a1a1a;margin-top:3px">Key stays in your browser only</div></div>'+(state.dbError?'<div style="font-size:8px;color:#ff3d57;margin-bottom:8px;padding:6px 8px;background:#ff3d5711;border-radius:4px">'+state.dbError+'</div>':'')+'<button onclick="connectDatabento()" style="width:100%;background:#00d4aa11;border:1px solid #00d4aa33;color:#00d4aa;padding:11px 0;border-radius:5px;cursor:pointer;font-size:10px;font-family:monospace;font-weight:700;letter-spacing:1px">'+(state.dbLoading?"~ CONNECTING...":"[ANT] CONNECT - LIVE MNQ DATA")+'</button><div style="margin-top:10px;background:#fbbf2408;border:1px solid #fbbf2411;border-radius:5px;padding:8px 10px"><div style="font-size:7px;color:#fbbf24;margin-bottom:3px">[TIP] FREE CREDITS</div><div style="font-size:7.5px;color:#333;line-height:1.5">Databento gives $125 free credits - enough for ~4 months of live MNQ data.</div></div></div>';
-  }
-  var TFS=["1s","5s","15s","30s","1m","2m","5m","15m","30m","1H","4H","D"];
-  var tfBtns=TFS.map(function(t){var act=state.tf===t;return '<button onclick="setTF(\''+t+'\')" style="background:'+(act?"#00d4aa22":"transparent")+';border:1px solid '+(act?"#00d4aa55":"#111")+';color:'+(act?"#00d4aa":"#333")+';padding:3px 8px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;flex-shrink:0;font-weight:'+(act?700:400)+'">'+t+'</button>';}).join("");
-  var maBtns=[["EMA 9","ema9","#fbbf24"],["EMA 21","ema21","#7ec8e3"],["EMA 50","ema50","#a78bfa"],["EMA 200","ema200","#ff6b35"],["VWAP","vwap","#ff3d57"]].map(function(m){var on=state.maShow[m[1]];return '<button onclick="toggleMA(\''+m[1]+'\')" style="background:'+(on?m[2]+"22":"transparent")+';border:1px solid '+(on?m[2]+"55":"#111")+';color:'+(on?m[2]:"#333")+';padding:2px 8px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace">'+m[0]+'</button>';}).join("");
-  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:7px;color:#00d4aa;font-weight:700">* LIVE - DATABENTO CME</span>'+(state.livePrice?'<span style="font-size:11px;color:#00ff9f;font-weight:700">'+state.livePrice.toFixed(2)+'</span>':'')+' '+(state.dbError?'<span style="font-size:7px;color:#ff3d57">'+state.dbError+'</span>':'')+'</div><button onclick="disconnectDB()" style="background:transparent;border:1px solid #111;color:#333;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace">DISCONNECT</button></div>'
-  +'<div style="display:flex;gap:3px;margin-bottom:6px;overflow-x:auto;padding-bottom:2px">'+tfBtns+'</div>'
-  +'<div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">'+maBtns+'</div>'
-  +'<div style="background:#0a0a0a;border:1px solid #fbbf2422;border-radius:5px;padding:7px 10px;margin-bottom:6px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px">! ORB LEVELS (draws on chart)</div><div style="display:flex;gap:6px;align-items:center"><input id="liveOrbHi" value="'+state.liveOrb.high+'" placeholder="ORB High" class="orb-input hi" style="flex:1" oninput="state.liveOrb.high=this.value"/><input id="liveOrbLo" value="'+state.liveOrb.low+'" placeholder="ORB Low" class="orb-input lo" style="flex:1" oninput="state.liveOrb.low=this.value"/><button onclick="setLiveORB()" style="background:#fbbf2411;border:1px solid #fbbf2433;color:#fbbf24;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;font-weight:700">SET</button>'+(state.liveOrb.active?'<button onclick="clearLiveORB()" style="background:transparent;border:1px solid #111;color:#333;padding:5px 8px;border-radius:3px;cursor:pointer;font-size:7px">X</button>':'')+'</div></div>'
-  +'<div style="background:#070707;border:1px solid #111;border-radius:5px;margin-bottom:6px;overflow:hidden">'+(state.candles.length===0?'<div style="height:280px;display:flex;align-items:center;justify-content:center;color:#222;font-size:9px">Loading MNQ candles...</div>':'<canvas id="liveCanvas" width="520" height="280" style="width:100%;display:block"></canvas>')+'</div>';
+  var TFS=["1m","3m","5m","15m","30m","1H","4H","D"];
+  var tvTF={"1m":"1","3m":"3","5m":"5","15m":"15","30m":"30","1H":"60","4H":"240","D":"D"};
+  var tf=state.tvTF||"5m";
+  var interval=tvTF[tf]||"5";
+  var tfBtns=TFS.map(function(t){var act=tf===t;return '<button onclick="state.tvTF=\''+t+'\';renderContent()" style="background:'+(act?"#00d4aa22":"transparent")+';border:1px solid '+(act?"#00d4aa55":"#111")+';color:'+(act?"#00d4aa":"#333")+';padding:3px 8px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;flex-shrink:0;font-weight:'+(act?700:400)+'">'+t+'</button>';}).join("");
+  return '<div style="font-family:monospace">'
+    +'<div style="font-size:9px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:6px">LIVE MNQ CHART - TRADINGVIEW</div>'
+    +'<div style="background:#fbbf2408;border:1px solid #fbbf2422;border-radius:5px;padding:7px 10px;margin-bottom:8px"><div style="font-size:7px;color:#fbbf24;margin-bottom:2px">! DATA NOTE</div><div style="font-size:8px;color:#555;line-height:1.5">Free TradingView = 15-min delay. Add CME data ($7/mo at tradingview.com) for real-time. Log into TradingView in your browser first.</div></div>'
+    +'<div style="display:flex;gap:3px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px">'+tfBtns+'</div>'
+    +'<div style="background:#0a0a0a;border:1px solid #fbbf2422;border-radius:5px;padding:7px 10px;margin-bottom:8px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px">! ORB LEVELS (note on chart manually)</div><div style="display:flex;gap:6px;align-items:center"><input value="'+state.liveOrb.high+'" placeholder="ORB High" class="orb-input hi" style="flex:1" oninput="state.liveOrb.high=this.value"/><input value="'+state.liveOrb.low+'" placeholder="ORB Low" class="orb-input lo" style="flex:1" oninput="state.liveOrb.low=this.value"/></div></div>'
+    +'<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:5px;margin-bottom:8px"><iframe scrolling="no" allowtransparency="true" frameborder="0" src="https://s3.tradingview.com/widgetembed/?frameElementId=tradingview_mnq&symbol=CME_MINI%3AMNQ1%21&interval='+interval+'&hidesidetoolbar=0&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=VWAP%40tv-studytemplate%7CMASimple%4040%7CMASimple%4021%7CMASimple%409&hidevolume=0&theme=dark&style=1&timezone=America%2FNew_York&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=mnqlee.github.io&utm_medium=widget" style="position:absolute;top:0;left:0;width:100%;height:100%;min-height:400px"></iframe></div>'
+    +'<div style="background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:7px 10px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px">! KEY LEVELS</div>'
+    +[["R2",SIGNAL.scalperLevels.r2,"#ff3d57"],["R1",SIGNAL.scalperLevels.r1,"#ff6b35"],["VWAP",SIGNAL.scalperLevels.vwap,"#fbbf24"],["S1",SIGNAL.scalperLevels.s1,"#00ff9f"],["S2",SIGNAL.scalperLevels.s2,"#00d4aa"]].map(function(item){return '<div class="level-row"><span style="font-size:8px;color:'+item[2]+';font-weight:700">'+item[0]+'</span><span style="font-size:9px;color:'+item[2]+';font-weight:700">'+item[1].toLocaleString()+'</span></div>';}).join("")
+    +'</div></div>';
 }
 
-function connectDatabento(){
+
+function connectDatabento_disabled(){
   if(!state.dbKey.trim()){state.dbError="Enter your Databento API key";renderContent();return;}
   state.dbLoading=true; state.dbError=""; saveKey(state.dbKey.trim()); renderContent();
   fetchDatabento(state.dbKey.trim(), state.tf);
 }
-function disconnectDB(){state.dbConnected=false;state.candles=[];state.dbError="";state.livePrice=null;clearKey();state.dbKey="";renderContent();}
+function disconnectDB_disabled(){state.dbConnected=false;state.candles=[];state.dbError="";state.livePrice=null;clearKey();state.dbKey="";renderContent();}
 function setTF(tf){state.tf=tf;if(state.dbConnected)fetchDatabento(state.dbKey,tf);renderContent();}
 function toggleMA(k){state.maShow[k]=!state.maShow[k];if(state.dbConnected)drawChart();else renderContent();}
 function setLiveORB(){state.liveOrb.active=!!(state.liveOrb.high&&state.liveOrb.low);if(state.dbConnected)drawChart();else renderContent();}
@@ -445,9 +449,8 @@ async function fetchDatabento(key, tf){
   var TF_SEC={"1s":1,"5s":5,"15s":15,"30s":30,"1m":60,"2m":120,"5m":300,"15m":900,"30m":1800,"1H":3600,"4H":14400,"D":86400};
   var sec=TF_SEC[tf]||300;
   var now=new Date();
-  // Always request data ending 2 minutes ago to ensure it exists
-  // Futures trade nearly 24hrs - only break is 5PM-6PM ET (21:00-22:00 UTC)
-  var endTime=new Date(now.getTime()-2*60*1000);
+  // Databento historical API has ~30min data lag - request ending 35min ago
+  var endTime=new Date(now.getTime()-35*60*1000);
   var startTime=new Date(endTime.getTime()-sec*200*1000);
   var s=startTime.toISOString().split(".")[0], e=endTime.toISOString().split(".")[0];
   try {
