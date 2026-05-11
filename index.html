@@ -449,7 +449,7 @@ async function fetchDatabento(key, tf){
   try {
     // Try puter.net.fetch first (bypasses CORS), fall back to regular fetch
 var fetchFn = (typeof puter !== "undefined" && puter.net && puter.net.fetch) ? puter.net.fetch : fetch;
-var res=await fetchFn("https://hist.databento.com/v0/timeseries.get_range?dataset=GLBX.MDP3&symbols=MNQ.c.0&schema="+schema+"&start="+s+"&end="+e+"&encoding=json&limit=200",{headers:{"Authorization":"Bearer "+key}});
+var res=await fetchFn("https://hist.databento.com/v0/timeseries.get_range?dataset=GLBX.MDP3&symbols=MNQ.c.0&schema="+schema+"&start="+s+"&end="+e+"&encoding=json&limit=200",{headers:{"Authorization":"Basic "+btoa(key+":")}});
     if(res.status===401){state.dbError="Invalid API key";state.dbLoading=false;state.dbConnected=false;renderContent();return;}
     if(!res.ok){state.dbError="Error "+res.status;state.dbLoading=false;renderContent();return;}
     var text=await res.text();
