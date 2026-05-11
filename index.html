@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>MNQ WarRoom v9</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#030303;color:#e0e0e0;font-family:monospace;min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#1a1a1a}
+input,button{font-family:monospace;outline:none}
+button:active{opacity:.6}
+.hdr{border-bottom:1px solid #0d0d0d;padding:8px 12px;flex-shrink:0}
+.hdr-r1{margin-bottom:8px}
+.hdr-title{font-size:20px;letter-spacing:3px;font-weight:700;line-height:1}
+.hdr-sub{font-size:7px;color:#1a1a1a;margin-top:1px}
+.hdr-r2{display:flex;align-items:center;gap:8px;margin-bottom:8px;overflow-x:auto}
+.clock-blk{flex-shrink:0}
+.clock-sess{font-size:7px;font-weight:700;letter-spacing:1px}
+.clock-time{font-size:18px;color:#00ff9f;font-weight:700;line-height:1.1}
+.clock-date{font-size:7px;color:#444}
+.price-box{background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:6px;padding:5px 10px;text-align:center;flex-shrink:0}
+.price-lbl{font-size:7px;color:#00ff9f;letter-spacing:1px}
+.price-val{font-size:20px;color:#00ff9f;font-weight:700;line-height:1}
+.price-chg{font-size:9px;font-weight:700}
+.price-age{font-size:7px}
+.vix-box{background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:5px 10px;text-align:center;flex-shrink:0}
+.vix-lbl{font-size:7px;color:#555}
+.vix-val{font-size:16px;font-weight:700}
+.vix-chg{font-size:7px}
+.oil-box{border-radius:5px;padding:5px 10px;text-align:center;flex-shrink:0;background:#0a0a0a}
+.refresh-btn{background:#fbbf2411;border:1px solid #fbbf2433;color:#fbbf24;padding:6px 16px;border-radius:5px;cursor:pointer;font-size:9px;font-weight:700;letter-spacing:1px;white-space:nowrap;width:100%}
+.stale-bar{background:#ff3d5711;border-bottom:1px solid #ff3d5533;padding:3px 12px;font-size:7.5px;color:#ff3d57;flex-shrink:0;display:none}
+.disclaimer{background:#080800;border-bottom:1px solid #fbbf2411;padding:2px 12px;font-size:7.5px;color:#fbbf2455;flex-shrink:0}
+.mag7-strip{border-bottom:1px solid #0a0a0a;padding:4px 12px;background:#050505;flex-shrink:0}
+.mag7-inner{display:flex;align-items:center;gap:6px}
+.mag7-lbl{font-size:7px;color:#1a1a1a;letter-spacing:2px;flex-shrink:0}
+.mag7-cards{flex:1;display:flex;gap:3px;overflow-x:auto}
+.mag7-card{background:#0a0a0a;border:1px solid #111;border-radius:3px;padding:2px 6px;flex-shrink:0}
+.mag7-sym{font-size:8px;font-weight:700}
+.mag7-price{font-size:9px;color:#ddd;font-weight:700}
+.mag7-pct{font-size:8px}
+.wtd-blk{flex-shrink:0;text-align:center}
+.wtd-lbl{font-size:7px;color:#333}
+.wtd-val{font-size:11px;font-weight:700}
+.tabs{display:flex;border-bottom:1px solid #0a0a0a;flex-shrink:0;overflow-x:auto}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:#222;padding:7px 12px;cursor:pointer;font-size:8px;letter-spacing:1px;font-weight:600;white-space:nowrap;font-family:monospace}
+.tab-btn.active{border-bottom:2px solid var(--tc);color:var(--tc);background:var(--tbg)}
+.content{flex:1;overflow-y:auto;padding:12px}
+.card{background:#070707;border:1px solid #111;border-radius:8px;padding:12px;margin-bottom:8px}
+.card-sm{background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:7px 10px;margin-bottom:8px}
+.lbl{font-size:7px;color:#333;letter-spacing:1px;margin-bottom:4px}
+.lbl-yellow{color:#fbbf24}
+.lbl-green{color:#00ff9f}
+.lbl-red{color:#ff3d57}
+.lbl-purple{color:#a78bfa}
+.lbl-teal{color:#00d4aa}
+.lbl-blue{color:#1d9bf0}
+.row{display:flex;justify-content:space-between;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.stat-box{background:#080808;border:1px solid #0d0d0d;border-radius:4px;padding:5px 7px}
+.stat-lbl{font-size:7px;color:#333}
+.stat-val{font-size:12px;font-weight:700}
+.bar-wrap{height:3px;background:#0d0d0d;border-radius:2px;overflow:hidden;margin-bottom:1px}
+.bar-fill{height:100%;background:linear-gradient(90deg,#ff3d57,#fbbf24,#00ff9f);background-size:200%;transition:width .5s}
+.gauge-wrap{min-width:212px;flex:0 0 212px}
+.footer{border-top:1px solid #080808;padding:3px 12px;display:flex;justify-content:space-between;flex-shrink:0}
+.footer span{font-size:7px;color:#111}
+.news-src{background:#080808;border:1px solid #111;border-radius:5px;padding:8px 10px;margin-bottom:6px}
+.news-hl{font-size:11px;color:#ddd;line-height:1.4;border-left:2px solid #333;padding-left:8px;margin-bottom:4px}
+.news-sum{font-size:9px;color:#555;line-height:1.4;padding-left:10px}
+.check-item{background:#0a0a0a;border:1px solid #0d0d0d;border-radius:4px;padding:7px 9px;margin-bottom:4px}
+.check-q{font-size:9px;color:#aaa;margin-bottom:5px;line-height:1.3}
+.check-btns{display:flex;gap:6px}
+.check-btn{flex:1;padding:4px 0;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;border:1px solid #1a1a1a;background:transparent;color:#333}
+.check-btn.yes{background:#00ff9f22;border-color:#00ff9f55;color:#00ff9f}
+.check-btn.no{background:#ff3d5722;border-color:#ff3d5755;color:#ff3d57}
+.gonogo{font-size:18px;font-weight:700}
+.level-row{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #111}
+.orb-input{width:100%;background:#111;border-radius:4px;padding:7px 8px;font-size:11px;font-family:monospace;font-weight:700}
+.orb-input.hi{border:1px solid #00ff9f33;color:#00ff9f}
+.orb-input.lo{border:1px solid #ff3d5733;color:#ff3d57}
+.target-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #0d0d0d}
+.hit-badge{font-size:7px;border-radius:2px;padding:0 4px}
+.journal-stat{background:#0a0a0a;border:1px solid #0d0d0d;border-radius:4px;padding:5px 7px}
+.trade-row{background:#080808;border-radius:4px;padding:7px 9px;margin-bottom:4px}
+.signal-badge{font-size:7px;border-radius:2px;padding:1px 5px;margin:2px}
+.social-row{background:#080808;border:1px solid #0f0f0f;border-radius:4px;padding:7px 10px;display:flex;gap:8px;margin-bottom:4px;text-decoration:none}
+.bomb-row{background:#ff3d5705;border:1px solid #ff3d5720;border-radius:4px;padding:7px 10px;display:flex;gap:8px;margin-bottom:4px;text-decoration:none}
+.chart-link{background:#0d0d0d;border-radius:5px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-r1">
+    <div class="hdr-title">MNQ <span style="color:#00ff9f">WAR</span><span style="color:#ff3d57">ROOM</span> <span style="font-size:8px;color:#333">v9</span></div>
+    <div class="hdr-sub">SCALPER EDITION . LIVE WEB DATA</div>
+  </div>
+  <div class="hdr-r2">
+    <div class="clock-blk">
+      <div class="clock-sess" id="sessLabel">NEW YORK</div>
+      <div class="clock-time" id="clockTime">--:--:--</div>
+      <div class="clock-date" id="clockDate">--</div>
+    </div>
+    <div class="price-box">
+      <div class="price-lbl">MNQ</div>
+      <div class="price-val" id="mnqPrice">29,333</div>
+      <div class="price-chg" id="mnqChg" style="color:#00e676">^2.27%</div>
+      <div class="price-age" id="priceAge" style="color:#00ff9f">* live</div>
+    </div>
+    <div class="vix-box">
+      <div class="vix-lbl">VIX</div>
+      <div class="vix-val" style="color:#00ff9f" id="vixVal">17.08</div>
+      <div class="vix-chg" style="color:#00ff9f77" id="vixChg">v0.64%</div>
+    </div>
+    <div class="oil-box" id="oilBox" style="border:1px solid #fbbf2444">
+      <div class="vix-lbl">OIL WTI</div>
+      <div class="vix-val" style="color:#00ff9f" id="oilVal">$95.08</div>
+      <div class="vix-chg" style="color:#ff3d5777" id="oilChg">^0.77%</div>
+      <div style="font-size:7px;color:#fbbf24;font-weight:700;margin-top:1px" id="oilAlert">MOVING UP</div>
+    </div>
+  </div>
+  <button class="refresh-btn" onclick="copyRefresh()">refresh REQUEST REFRESH</button>
+</div>
+
+<div class="stale-bar" id="staleBar">DATA OLD - Tap REQUEST REFRESH above</div>
+<div class="disclaimer" id="disclaimerBar">! May 11, 2026 - Monday Open. Verify on Barchart. . VERIFY PRICES ON BARCHART . NOT FINANCIAL ADVICE . USE STOPS</div>
+
+<div class="mag7-strip">
+  <div class="mag7-inner">
+    <span class="mag7-lbl">MAG7</span>
+    <div class="mag7-cards" id="mag7Cards"></div>
+    <div class="wtd-blk">
+      <div class="wtd-lbl">WTD</div>
+      <div class="wtd-val" id="wtdVal" style="color:#00e676">+1.47%</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs" id="tabBar"></div>
+<div class="content" id="content"></div>
+
+<div class="footer">
+  <span>MNQ WARROOM v9 SCALPER EDITION . NOT FINANCIAL ADVICE . USE STOPS</span>
+  <span>VERIFY PRICES</span>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+var LIVE = {
+  dataTimestamp: "May 11, 2026 - Monday Open",
+  MNQ: { price: 29333, chg: 650, chgPct: 2.27, high: 29420, low: 28860, open: 29200 },
+  AAPL:  { price: 293.23, chgPct: 1.96, color:"#a8d8ea", w:12 },
+  MSFT:  { price: 428.10, chgPct: 3.42, color:"#7ec8e3", w:13 },
+  NVDA:  { price: 213.40, chgPct: 2.68, color:"#76c442", w:11 },
+  AMZN:  { price: 265.80, chgPct:-3.35, color:"#ff9f1c", w:9  },
+  GOOGL: { price: 397.90, chgPct: 0.70, color:"#fbdd74", w:8  },
+  META:  { price: 621.40, chgPct: 1.39, color:"#5890ff", w:7  },
+  TSLA:  { price: 408.30, chgPct: 2.40, color:"#e82127", w:6  },
+  VIX:   { price: 17.08, chgPct:-0.64, note:"VIX dipping toward 17 - Iran deal hopes + Trump-Xi summit. Below 20 = scalp-friendly." },
+  OIL:   { price: 95.08, chgPct:-0.77, note:"WTI ~$95. Hormuz still closed but Iran sent peace proposal. Trump-Xi summit May 14-15 is the market deadline." },
+  NOTE:  "MONDAY MAY 11: MNQ last $29,333. ATH week - S&P 7,398 + Nasdaq 26,247 both records. CPI Tue 8:30 AM, PPI Wed, Trump-Xi May 14-15."
+};
+
+var MAG7 = ["AAPL","MSFT","NVDA","AMZN","GOOGL","META","TSLA"];
+
+var NEWS = {
+  overallBias: "BULL",
+  asOf: "May 11, 2026 - Monday Morning",
+  mnqImplication: "Markets open Monday on ATH momentum. S&P 7,398 + Nasdaq 26,247 - 6-week win streak. THIS WEEK: CPI Tue 8:30 AM (est 3.7%) and Trump-Xi summit May 14-15. Iran peace deal = oil dumps = NQ rips +2%+.",
+  keyRisk: "CPI Tue 8:30 AM - est 3.7% from 3.3%. Hot print = rate hike fear = NQ -400-600pts. Hormuz closed. Trump Truth Social posts this week = instant vol.",
+  fedWatch: "Fed on hold. No cuts 2026. CPI Tuesday is biggest domestic risk. Higher-for-longer regime intact.",
+  tweetRisk: "Trump flying to Beijing May 14-15. Watch @realDonaldTrump ALL WEEK - any Iran escalation = NQ -400pts.",
+  sources: [
+    { name:"CNBC", color:"#0072ce", bias:"BULL", headline:"S&P + Nasdaq at ALL-TIME HIGHS - 6-week win streak, ATH momentum", summary:"S&P 7,398.93, Nasdaq 26,247.08 both records. NQ futures +0.47% Monday pre-market on lower oil. Semis led: MU +13%, AMD +8%.", url:"https://www.cnbc.com", publishedAt:"May 11" },
+    { name:"Oil/Iran", color:"#ff8c00", bias:"NEUTRAL", headline:"WTI $95, Hormuz still closed - Iran peace proposal via Pakistan", summary:"Iran sent updated proposal via Pakistani mediators. Trump said not satisfied. Hormuz closed since Feb 28. Oil down 7% on week but fragile.", url:"https://www.cnbc.com", publishedAt:"May 8" },
+    { name:"Summit", color:"#fbbf24", bias:"BULL", headline:"Trump-Xi Beijing summit May 14-15 - Iran/Hormuz dominates agenda", summary:"First US presidential visit to China since 2017. Iran war tops agenda. China urged Iran to pursue deal. Binary outcome for NQ.", url:"https://www.cnbc.com", publishedAt:"May 8-11" },
+    { name:"CPI Week", color:"#ff3d57", bias:"NEUTRAL", headline:"CPI Tuesday 8:30 AM - est 3.7% - biggest domestic risk of week", summary:"April CPI expected 3.7-3.9% vs 3.3% prior. Hot print = Fed hike fears = NQ -400pts. PPI Wednesday. Retail Sales Thursday.", url:"https://www.barchart.com", publishedAt:"May 11" },
+    { name:"Semis/AI", color:"#76c442", bias:"BULL", headline:"Semis remain NQ engine - DRAM ETF +30%, AMD +17%, SMCI +24%", summary:"Memory stocks exploded. AMD +17% on data center guidance. Apple-Intel chip talks ongoing. AI infrastructure spend intact.", url:"https://www.cnbc.com", publishedAt:"May 8" },
+    { name:"Fed/Macro", color:"#a78bfa", bias:"NEUTRAL", headline:"Higher-for-longer confirmed - CPI Tue is rate catalyst, VIX 17", summary:"VIX 17.08 dipping. No Fed cuts in 2026. CPI Tuesday will test whether Hormuz inflation is broadening.", url:"https://www.federalreserve.gov", publishedAt:"May 11" }
+  ]
+};
+
+var SIGNAL = {
+  scores: { newsAndMacro:72, mag7Alignment:66, technicalBias:70, sentimentFlow:62, riskEnv:42 },
+  composite: 65,
+  conviction: "LEAN LONG - REDUCE SIZE",
+  reasoning: {
+    newsAndMacro:  "ATH momentum + Iran deal hopes. CPI Tue + Trump-Xi = binary risk all week.",
+    mag7Alignment: "6/7 MAG7 green. Semis ripping. AMZN only drag.",
+    technicalBias: "Above key HVN. Strong buy technical rating.",
+    sentimentFlow: "VIX 17 dipping - calm but summit + CPI = tail risk.",
+    riskEnv:       "Hormuz closed. CPI Tue. Trump-Xi binary. Truth Social risk all week."
+  },
+  scalperLevels: { r3:29650, r2:29500, r1:29420, vwap:29200, s1:29000, s2:28860, s3:28700 },
+  keyLevels: { resistance:"29,420 / 29,500 / 29,650", support:"29,000 / 28,860", pivot:"29,200 (VWAP)" },
+  thesis: "LEAN LONG but REDUCE SIZE - ATH 6-week momentum with semi strength and Iran deal hopes into Trump-Xi. CPI Tue 8:30 AM, PPI Wed, Trump-Xi May 14-15. Trade ORB at open, take R1, do NOT hold into CPI.",
+  entryNotes: "TODAY: 9:30 open + 5-min ORB. Long above 29,200 VWAP -> R1 29,420, stop 29,100. PRE-CPI: Cut to 1 contract, 50pt stops. POST-CPI: Trade the reaction only.",
+  mainRisk: "CPI Tuesday 8:30 AM - 4%+ = NQ -400-600pts. Trump-Xi summit May 14-15 = Iran deal binary. Check @realDonaldTrump before EVERY entry."
+};
+
+var PRETRADE = [
+  { id:"trend",   q:"Is price above VWAP?",                      bull:"Yes -> long bias",     bear:"No -> short bias" },
+  { id:"mag7",    q:"Are 5+ MAG7 stocks green?",                  bull:"Yes -> NQ tailwind",   bear:"No -> wait or fade" },
+  { id:"vix",     q:"Is VIX below 20?",                           bull:"Yes -> scalp friendly",bear:"VIX>20 -> wider stops" },
+  { id:"oil",     q:"Oil alert? (check PRICES tab)",               bull:"QUIET -> proceed",     bear:"SPIKE UP -> avoid longs" },
+  { id:"bombs",   q:"Checked @realDonaldTrump last 15 min?",      bull:"Clean -> proceed",     bear:"Tweet risk -> wait" },
+  { id:"news",    q:"Any breaking news in last 5 min?",           bull:"No news -> proceed",   bear:"Breaking -> wait 2 bars" },
+  { id:"session", q:"Are you in NY or London session?",           bull:"Yes -> full size",     bear:"Asia -> half size" },
+  { id:"spread",  q:"Is MNQ spread 1-2 ticks?",                   bull:"Tight -> proceed",     bear:"Wide spread -> wait" }
+];
+
+var NQ_TRADERS = [
+  {h:"TradingWithAB",  label:"NQ Levels",    why:"Direct MNQ long/short entries and key levels"},
+  {h:"mercenaryjack",  label:"Tape Reading",  why:"Short-term momentum and scalp tape reads"},
+  {h:"NorthmanTrader", label:"HTF Bias",      why:"Higher timeframe NQ bull/bear structure"},
+  {h:"OptionsHawk",    label:"Smart Money",   why:"Dark pool + unusual options flow on NQ/QQQ"},
+  {h:"unusual_whales", label:"Inst. Flow",    why:"Congress trades and institutional positioning"},
+  {h:"LiveSquawk",     label:"Breaking News", why:"Real-time macro headlines - critical for scalpers"},
+  {h:"zerohedge",      label:"Bearish Macro", why:"Contrarian signals, liquidity warnings"}
+];
+
+var BOMBS = [
+  {h:"realDonaldTrump",label:"TARIFF BOMB", why:"Posts move NQ +/-400pts instantly. CHECK BEFORE EVERY SCALP."},
+  {h:"elonmusk",       label:"VOL SPIKE",   why:"TSLA/DOGE/macro - triggers rapid vol."},
+  {h:"federalreserve", label:"RATE SHOCK",  why:"Unscheduled Fed statement = NQ +/-300pts."},
+  {h:"WhiteHouse",     label:"POLICY RISK", why:"Tech regulation, AI policy, tariff executive orders."}
+];
+
+var CHART_LINKS = [
+  {label:"TradingView MNQ", url:"https://www.tradingview.com/chart/?symbol=CME_MINI%3AMNQ1%21", color:"#2962ff", desc:"Live MNQ chart - best free option"},
+  {label:"Barchart MNQ",    url:"https://www.barchart.com/futures/quotes/MNQ*0/interactive-chart", color:"#00d4aa", desc:"Live MNQ with volume profile"},
+  {label:"Investing.com NQ",url:"https://www.investing.com/indices/nq-100-futures-chart", color:"#e84142", desc:"NQ100 futures chart"},
+  {label:"CME Group MNQ",   url:"https://www.cmegroup.com/markets/equities/nasdaq/micro-e-mini-nasdaq-100.quotes.html", color:"#0066cc", desc:"Official CME data"}
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var state = {
+  tab: "signal",
+  checks: {},
+  orbHigh: "", orbLow: "", orbActive: false, orbType: "5",
+  fvgNotes: [], fvgInput: "",
+  trades: [],
+  tradeForm: { side:"LONG", entry:"", exit:"", size:"1", notes:"" },
+  addingTrade: false,
+  currentPrice: "",
+  orbSetup: null,
+  dbKey: "", dbConnected: false, dbError: "", dbLoading: false,
+  candles: [], tf: "5m",
+  maShow: { ema9:true, ema21:true, ema50:false, ema200:false, vwap:true },
+  liveOrb: { high:"", low:"", active:false },
+  livePrice: null
+};
+
+var TABS = [
+  {id:"signal",  label:"SIGNAL",  color:"#a78bfa"},
+  {id:"live",    label:"LIVE",    color:"#00d4aa"},
+  {id:"scalp",   label:"SCALP",   color:"#fbbf24"},
+  {id:"orb",     label:"ORB",     color:"#ff6b35"},
+  {id:"journal", label:"JOURNAL", color:"#00ff9f"},
+  {id:"prices",  label:"PRICES",  color:"#fbdd74"},
+  {id:"news",    label:"NEWS",    color:"#ff6b35"},
+  {id:"charts",  label:"CHARTS",  color:"#00d4aa"},
+  {id:"social",  label:"SOCIAL",  color:"#1d9bf0"}
+];
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function c(color){ return color >= 0 ? "#00e676" : "#ff3d57"; }
+function pct(v){ return (v>=0?"^":"")+Math.abs(v).toFixed(2)+"%" }
+function green(v){ return v>=0?"#00e676":"#ff3d57"; }
+function getOilAlert(){
+  var chg = Math.abs(LIVE.OIL.chgPct||0);
+  var dir = (LIVE.OIL.chgPct||0) >= 0 ? "up" : "down";
+  if(chg>=2) return dir==="up"?{level:"SPIKE UP",color:"#ff3d57",action:"AVOID LONGS"}:{level:"SPIKE DOWN",color:"#00ff9f",action:"LEAN LONG"};
+  if(chg>=1) return dir==="up"?{level:"MOVING UP",color:"#fbbf24",action:"TIGHTEN STOPS"}:{level:"MOVING DOWN",color:"#00d4aa",action:"MILD TAILWIND"};
+  return {level:"QUIET",color:"#888",action:"IGNORE OIL"};
+}
+function calcEMA(data, period){
+  if(data.length<period) return [];
+  var k=2/(period+1), emas=[];
+  var sum=data.slice(0,period).reduce(function(a,b){return a+b.close;},0);
+  emas.push({i:period-1,v:sum/period});
+  for(var i=period;i<data.length;i++) emas.push({i:i,v:data[i].close*k+emas[emas.length-1].v*(1-k)});
+  return emas;
+}
+function calcVWAP(data){
+  var ct=0,cv=0;
+  return data.map(function(c){ct+=(c.high+c.low+c.close)/3*(c.volume||1);cv+=(c.volume||1);return ct/cv;});
+}
+function detectFVGs(data){
+  var fvgs=[];
+  for(var i=2;i<data.length;i++){
+    var p=data[i-2],m=data[i-1],c=data[i];
+    if(c.low>p.high) fvgs.push({type:"bull",top:c.low,bot:p.high,idx:i,filled:false});
+    if(c.high<p.low) fvgs.push({type:"bear",top:p.low,bot:c.high,idx:i,filled:false});
+  }
+  fvgs.forEach(function(f){
+    for(var j=f.idx+1;j<data.length;j++){
+      if(f.type==="bull"&&data[j].low<=f.top){f.filled=true;break;}
+      if(f.type==="bear"&&data[j].high>=f.bot){f.filled=true;break;}
+    }
+  });
+  return fvgs.slice(-20);
+}
+
+// ── CLOCK ─────────────────────────────────────────────────────────────────────
+function updateClock(){
+  var now=new Date();
+  var h=now.getUTCHours(), dow=now.getUTCDay();
+  var isFriClose=dow===5&&h>=21, isSat=dow===6, isSunBefore=dow===0&&h<22;
+  var isWknd=isFriClose||isSat||isSunBefore;
+  var sess=isWknd?{n:"WEEKEND - CLOSED",c:"#ff3d57"}:h>=22||h<3?{n:"ASIA",c:"#fbdd74"}:h>=3&&h<9?{n:"LONDON",c:"#7ec8e3"}:{n:"NEW YORK",c:"#ff6b35"};
+  var el=document.getElementById("sessLabel");
+  if(el){el.textContent=sess.n;el.style.color=sess.c;}
+  var te=document.getElementById("clockTime");
+  if(te) te.textContent=now.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  var de=document.getElementById("clockDate");
+  if(de) de.textContent=now.toLocaleDateString([],{weekday:"short",month:"short",day:"numeric"});
+  var age=(now-new Date("2026-05-11T09:00:00-04:00"))/3600000;
+  var sb=document.getElementById("staleBar");
+  if(sb) sb.style.display=age>6?"block":"none";
+}
+
+// ── MAG7 STRIP ────────────────────────────────────────────────────────────────
+function renderMag7(){
+  var html="";
+  var wtd=0, tw=0;
+  MAG7.forEach(function(sym){
+    var q=LIVE[sym]; if(!q) return;
+    var up=q.chgPct>=0;
+    html+='<div class="mag7-card"><div class="mag7-sym" style="color:'+q.color+'">'+sym+'</div><div class="mag7-price">$'+q.price.toFixed(2)+'</div><div class="mag7-pct" style="color:'+(up?"#00e676":"#ff3d57")+'">'+(up?"^":"v")+Math.abs(q.chgPct).toFixed(1)+'%</div></div>';
+    wtd+=q.chgPct*q.w; tw+=q.w;
+  });
+  var mc=document.getElementById("mag7Cards"); if(mc) mc.innerHTML=html;
+  var wv=document.getElementById("wtdVal");
+  if(wv){var w=wtd/tw;wv.textContent=(w>=0?"+":"")+w.toFixed(2)+"%";wv.style.color=w>=0?"#00e676":"#ff3d57";}
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function renderTabs(){
+  var html="";
+  TABS.forEach(function(t){
+    var act=state.tab===t.id;
+    html+='<button class="tab-btn'+(act?" active":"")+'" style="--tc:'+t.color+';--tbg:'+t.color+'0a" onclick="setTab(\''+t.id+'\')">'+t.label+'</button>';
+  });
+  var tb=document.getElementById("tabBar"); if(tb) tb.innerHTML=html;
+}
+function setTab(id){ state.tab=id; renderTabs(); renderContent(); }
+
+// ── RENDER CONTENT ────────────────────────────────────────────────────────────
+function renderContent(){
+  var el=document.getElementById("content"); if(!el) return;
+  if(state.tab==="signal") el.innerHTML=renderSignal();
+  else if(state.tab==="live") el.innerHTML=renderLive();
+  else if(state.tab==="scalp") el.innerHTML=renderScalp();
+  else if(state.tab==="orb") el.innerHTML=renderORB();
+  else if(state.tab==="journal") el.innerHTML=renderJournal();
+  else if(state.tab==="prices") el.innerHTML=renderPrices();
+  else if(state.tab==="news") el.innerHTML=renderNews();
+  else if(state.tab==="charts") el.innerHTML=renderCharts();
+  else if(state.tab==="social") el.innerHTML=renderSocial();
+  attachHandlers();
+}
+
+// ── SIGNAL TAB ────────────────────────────────────────────────────────────────
+function renderSignal(){
+  var sig=SIGNAL; var pct2=Math.max(5,Math.min(95,sig.composite||50));
+  var col=pct2>=62?"#00ff9f":pct2<=38?"#ff3d57":"#fbbf24";
+  var now=new Date(); var h=now.getUTCHours(); var dow=now.getUTCDay();
+  var isWknd=(dow===5&&h>=21)||dow===6||(dow===0&&h<22);
+  var sessHtml="";
+  if(isWknd){
+    var nowM=dow*1440+h*60+now.getUTCMinutes();
+    var reopenM=0*1440+22*60; if(dow===5) reopenM=7*1440+22*60;
+    var diff=reopenM-nowM; if(diff<0) diff+=7*1440;
+    sessHtml='<div class="card-sm"><div class="lbl">SESSION CLOCK</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div style="background:#ff3d5722;border:1px solid #ff3d5555;border-radius:3px;padding:3px 8px"><span style="font-size:8px;color:#ff3d57;font-weight:700">[||] MARKETS CLOSED - WEEKEND</span></div><div style="display:flex;gap:4px;align-items:center"><span style="font-size:8px;color:#fbbf24;font-weight:700">Futures reopen '+Math.floor(diff/60)+'h '+diff%60+'m</span><span style="font-size:7px;color:#444">Sun 6 PM ET</span></div></div><div style="font-size:7.5px;color:#333;margin-top:5px">Use this time to plan your week</div></div>';
+  } else {
+    var sessions=[{name:"ASIA OPEN",utcH:19},{name:"LONDON OPEN",utcH:3},{name:"NY PRE-MARKET",utcH:9},{name:"NY OPEN",utcH:13,utcM:30},{name:"LONDON CLOSE",utcH:16},{name:"NY CLOSE",utcH:20}];
+    var nowMin=h*60+now.getUTCMinutes();
+    var upcoming=sessions.map(function(s){var sm=(s.utcH||0)*60+(s.utcM||0);var d=sm-nowMin;if(d<-120)d+=1440;return{name:s.name,diff:d};}).filter(function(s){return s.diff>=0;}).slice(0,3);
+    sessHtml='<div class="card-sm"><div class="lbl">SESSION CLOCK</div><div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">';
+    upcoming.forEach(function(u){sessHtml+='<span style="font-size:7px;color:#555">'+u.name+'</span><span style="font-size:8px;color:#fbbf24;font-weight:700">in '+(u.diff<60?u.diff+'m':Math.floor(u.diff/60)+'h '+u.diff%60+'m')+'</span>';});
+    sessHtml+='</div></div>';
+  }
+  var oilAlert=getOilAlert();
+  var oilHtml="";
+  if(Math.abs(LIVE.OIL.chgPct||0)>=1){
+    oilHtml='<div style="background:'+oilAlert.color+'11;border:1px solid '+oilAlert.color+'44;border-radius:5px;padding:8px 10px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><span style="font-size:9px;color:'+oilAlert.color+';font-weight:700">OIL ALERT: '+oilAlert.level+' - $'+LIVE.OIL.price+' ('+pct(LIVE.OIL.chgPct)+')</span><span style="font-size:8px;color:'+oilAlert.color+';border:1px solid '+oilAlert.color+'44;border-radius:2px;padding:0 5px;font-weight:700">'+oilAlert.action+'</span></div></div>';
+  }
+  var KEYS=[["newsAndMacro","NEWS/MACRO",25],["mag7Alignment","MAG7",25],["technicalBias","TECH",20],["sentimentFlow","SENTIMENT",20],["riskEnv","RISK",10]];
+  var scoreHtml="";
+  KEYS.forEach(function(item){
+    var v=sig.scores[item[0]]||50; var sc=v>=60?"#00ff9f":v<=40?"#ff3d57":"#fbbf24";
+    var why=sig.reasoning[item[0]]||"";
+    scoreHtml+='<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:7.5px;color:#2a2a2a">'+item[1]+' '+item[2]+'%</span><span style="font-size:9px;color:'+sc+';font-weight:700">'+v+'</span></div><div class="bar-wrap"><div class="bar-fill" style="width:'+v+'%;background-position:'+(100-v)+'%"></div></div>'+(why?'<div style="font-size:8px;color:#444;line-height:1.3">'+(why.length>70?why.slice(0,70)+"...":why)+'</div>':'')+'</div>';
+  });
+  var R=80,CX=106,CY=102;
+  var ang=Math.PI*(1-pct2/100);
+  var nX=(CX+(R-14)*Math.cos(ang)).toFixed(1),nY=(CY-(R-14)*Math.sin(ang)).toFixed(1);
+  var fX=(CX+R*Math.cos(ang)).toFixed(1),fY=(CY-R*Math.sin(ang)).toFixed(1);
+  return sessHtml+oilHtml+'<div class="card"><div style="font-size:7.5px;color:#2a2a2a;letter-spacing:2px;margin-bottom:4px">DECISION SIGNAL</div><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start"><div style="min-width:212px;flex:0 0 212px"><svg viewBox="0 0 212 120" style="width:100%;display:block"><path d="M '+(CX-R)+' '+CY+' A '+R+' '+R+' 0 0 1 '+(CX+R)+' '+CY+'" fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linecap="round"/><path d="M '+(CX-R)+' '+CY+' A '+R+' '+R+' 0 0 1 '+fX+' '+fY+'" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" style="filter:drop-shadow(0 0 5px '+col+'88)"/><line x1="'+CX+'" y1="'+(CY+1)+'" x2="'+nX+'" y2="'+(+nY+1)+'" stroke="#00000077" stroke-width="3" stroke-linecap="round"/><line x1="'+CX+'" y1="'+CY+'" x2="'+nX+'" y2="'+nY+'" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="'+CX+'" cy="'+CY+'" r="5" fill="#111" stroke="#444" stroke-width="1.5"/><circle cx="'+CX+'" cy="'+CY+'" r="2.5" fill="'+col+'"/><text x="'+(CX-R)+'" y="'+(CY+15)+'" fill="#ff3d57aa" font-size="9" font-family="monospace" text-anchor="middle">SHORT</text><text x="'+(CX+R)+'" y="'+(CY+15)+'" fill="#00ff9faa" font-size="9" font-family="monospace" text-anchor="middle">LONG</text><text x="'+CX+'" y="'+(CY-19)+'" fill="'+col+'" font-size="21" font-family="monospace" font-weight="bold" text-anchor="middle">'+pct2+'%</text><text x="'+CX+'" y="'+(CY-5)+'" fill="'+col+'" font-size="7.5" font-family="monospace" text-anchor="middle">'+sig.conviction+'</text></svg><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin-top:2px"><div style="width:'+(100-pct2)+'%;background:#ff3d57"></div><div style="width:'+pct2+'%;background:#00ff9f"></div></div><div style="display:flex;justify-content:space-between;margin-top:2px"><span style="font-size:7px;color:#ff3d57">SHORT '+(100-pct2)+'%</span><span style="font-size:7px;color:#00ff9f">LONG '+pct2+'%</span></div>'
+  +'<div style="margin-top:8px;background:#0a0a0a;border:1px solid #111;border-radius:4px;padding:7px 9px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px;letter-spacing:1px">! SCALPER LEVELS</div>'
+  +[["R3",sig.scalperLevels.r3,"#ff3d5766"],["R2",sig.scalperLevels.r2,"#ff3d5799"],["R1",sig.scalperLevels.r1,"#ff4444bb"],["VWAP",sig.scalperLevels.vwap,"#fbbf24"],["S1",sig.scalperLevels.s1,"#00ff9fbb"],["S2",sig.scalperLevels.s2,"#00ff9f99"],["S3",sig.scalperLevels.s3,"#00ff9f66"]].map(function(item){return '<div class="level-row"><span style="font-size:8px;color:'+item[2]+';font-weight:700">'+item[0]+'</span><span style="font-size:9px;color:'+item[2]+';font-weight:700">'+item[1].toLocaleString()+'</span></div>';}).join('')
+  +'</div></div><div style="flex:1;min-width:130px">'+scoreHtml+'</div></div>'
+  +'<div style="margin-top:8px;background:'+col+'0d;border:1px solid '+col+'22;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:'+col+';margin-bottom:2px">DOMINANT THESIS</div><div style="font-size:10px;color:#888;line-height:1.5">'+sig.thesis+'</div></div>'
+  +'<div style="margin-top:5px;background:#fbbf2408;border:1px solid #fbbf2422;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:#fbbf24;margin-bottom:2px">! SCALP ENTRY NOTES</div><div style="font-size:10px;color:#777;line-height:1.5">'+sig.entryNotes+'</div></div>'
+  +'<div style="margin-top:5px;background:#ff3d5708;border:1px solid #ff3d5722;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:#ff3d57;margin-bottom:2px">[!] TOP RISK</div><div style="font-size:10px;color:#555;line-height:1.5">'+sig.mainRisk+'</div></div>'
+  +'</div>';
+}
+
+// ── LIVE TAB ──────────────────────────────────────────────────────────────────
+function renderLive(){
+  if(!state.dbConnected){
+    return '<div class="card"><div style="font-size:10px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:4px">[ANT] DATABENTO LIVE CHART</div><div style="font-size:8px;color:#444;margin-bottom:12px;line-height:1.7">Connect your Databento account for live MNQ candles - all timeframes, EMAs, VWAP, ORB, FVG detection and entry alerts.</div><div style="background:#00d4aa08;border:1px solid #00d4aa22;border-radius:6px;padding:10px 12px;margin-bottom:12px"><div style="font-size:8px;color:#00d4aa;font-weight:700;margin-bottom:6px">SETUP - 2 MINUTES</div><div style="font-size:8px;color:#555;line-height:1.8">1. Go to databento.com and sign up free ($125 credits)<br>2. Log in -> click your name -> API Keys<br>3. Create API Key -> copy it<br>4. Paste below and tap CONNECT</div></div><div style="margin-bottom:10px"><div style="font-size:7px;color:#444;margin-bottom:4px;letter-spacing:1px">DATABENTO API KEY</div><input id="dbKeyInput" type="password" value="'+state.dbKey+'" placeholder="db-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="width:100%;background:#111;border:1px solid #00d4aa33;color:#00d4aa;padding:9px 10px;border-radius:4px;font-size:10px;font-family:monospace" oninput="state.dbKey=this.value"/><div style="font-size:7px;color:#1a1a1a;margin-top:3px">Key stays in your browser only</div></div>'+(state.dbError?'<div style="font-size:8px;color:#ff3d57;margin-bottom:8px;padding:6px 8px;background:#ff3d5711;border-radius:4px">'+state.dbError+'</div>':'')+'<button onclick="connectDatabento()" style="width:100%;background:#00d4aa11;border:1px solid #00d4aa33;color:#00d4aa;padding:11px 0;border-radius:5px;cursor:pointer;font-size:10px;font-family:monospace;font-weight:700;letter-spacing:1px">'+(state.dbLoading?"~ CONNECTING...":"[ANT] CONNECT - LIVE MNQ DATA")+'</button><div style="margin-top:10px;background:#fbbf2408;border:1px solid #fbbf2411;border-radius:5px;padding:8px 10px"><div style="font-size:7px;color:#fbbf24;margin-bottom:3px">[TIP] FREE CREDITS</div><div style="font-size:7.5px;color:#333;line-height:1.5">Databento gives $125 free credits - enough for ~4 months of live MNQ data.</div></div></div>';
+  }
+  var TFS=["1s","5s","15s","30s","1m","2m","5m","15m","30m","1H","4H","D"];
+  var tfBtns=TFS.map(function(t){var act=state.tf===t;return '<button onclick="setTF(\''+t+'\')" style="background:'+(act?"#00d4aa22":"transparent")+';border:1px solid '+(act?"#00d4aa55":"#111")+';color:'+(act?"#00d4aa":"#333")+';padding:3px 8px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;flex-shrink:0;font-weight:'+(act?700:400)+'">'+t+'</button>';}).join("");
+  var maBtns=[["EMA 9","ema9","#fbbf24"],["EMA 21","ema21","#7ec8e3"],["EMA 50","ema50","#a78bfa"],["EMA 200","ema200","#ff6b35"],["VWAP","vwap","#ff3d57"]].map(function(m){var on=state.maShow[m[1]];return '<button onclick="toggleMA(\''+m[1]+'\')" style="background:'+(on?m[2]+"22":"transparent")+';border:1px solid '+(on?m[2]+"55":"#111")+';color:'+(on?m[2]:"#333")+';padding:2px 8px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace">'+m[0]+'</button>';}).join("");
+  return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:7px;color:#00d4aa;font-weight:700">* LIVE - DATABENTO CME</span>'+(state.livePrice?'<span style="font-size:11px;color:#00ff9f;font-weight:700">'+state.livePrice.toFixed(2)+'</span>':'')+' '+(state.dbError?'<span style="font-size:7px;color:#ff3d57">'+state.dbError+'</span>':'')+'</div><button onclick="disconnectDB()" style="background:transparent;border:1px solid #111;color:#333;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace">DISCONNECT</button></div>'
+  +'<div style="display:flex;gap:3px;margin-bottom:6px;overflow-x:auto;padding-bottom:2px">'+tfBtns+'</div>'
+  +'<div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">'+maBtns+'</div>'
+  +'<div style="background:#0a0a0a;border:1px solid #fbbf2422;border-radius:5px;padding:7px 10px;margin-bottom:6px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px">! ORB LEVELS (draws on chart)</div><div style="display:flex;gap:6px;align-items:center"><input id="liveOrbHi" value="'+state.liveOrb.high+'" placeholder="ORB High" class="orb-input hi" style="flex:1" oninput="state.liveOrb.high=this.value"/><input id="liveOrbLo" value="'+state.liveOrb.low+'" placeholder="ORB Low" class="orb-input lo" style="flex:1" oninput="state.liveOrb.low=this.value"/><button onclick="setLiveORB()" style="background:#fbbf2411;border:1px solid #fbbf2433;color:#fbbf24;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace;font-weight:700">SET</button>'+(state.liveOrb.active?'<button onclick="clearLiveORB()" style="background:transparent;border:1px solid #111;color:#333;padding:5px 8px;border-radius:3px;cursor:pointer;font-size:7px">X</button>':'')+'</div></div>'
+  +'<div style="background:#070707;border:1px solid #111;border-radius:5px;margin-bottom:6px;overflow:hidden">'+(state.candles.length===0?'<div style="height:280px;display:flex;align-items:center;justify-content:center;color:#222;font-size:9px">Loading MNQ candles...</div>':'<canvas id="liveCanvas" width="520" height="280" style="width:100%;display:block"></canvas>')+'</div>';
+}
+
+function connectDatabento(){
+  if(!state.dbKey.trim()){state.dbError="Enter your Databento API key";renderContent();return;}
+  state.dbLoading=true; state.dbError=""; saveKey(state.dbKey.trim()); renderContent();
+  fetchDatabento(state.dbKey.trim(), state.tf);
+}
+function disconnectDB(){state.dbConnected=false;state.candles=[];state.dbError="";state.livePrice=null;clearKey();state.dbKey="";renderContent();}
+function setTF(tf){state.tf=tf;if(state.dbConnected)fetchDatabento(state.dbKey,tf);renderContent();}
+function toggleMA(k){state.maShow[k]=!state.maShow[k];if(state.dbConnected)drawChart();else renderContent();}
+function setLiveORB(){state.liveOrb.active=!!(state.liveOrb.high&&state.liveOrb.low);if(state.dbConnected)drawChart();else renderContent();}
+function clearLiveORB(){state.liveOrb={high:"",low:"",active:false};if(state.dbConnected)drawChart();else renderContent();}
+
+async function fetchDatabento(key, tf){
+  var TF_MAP={"1s":"ohlcv-1s","5s":"ohlcv-1s","15s":"ohlcv-1s","30s":"ohlcv-1s","1m":"ohlcv-1m","2m":"ohlcv-1m","5m":"ohlcv-1m","15m":"ohlcv-1m","30m":"ohlcv-1m","1H":"ohlcv-1h","4H":"ohlcv-1h","D":"ohlcv-1d"};
+  var TF_AGG={"5s":5,"15s":15,"30s":30,"2m":2,"5m":5,"15m":15,"30m":30,"4H":4};
+  var schema=TF_MAP[tf]||"ohlcv-1m";
+  var TF_SEC={"1s":1,"5s":5,"15s":15,"30s":30,"1m":60,"2m":120,"5m":300,"15m":900,"30m":1800,"1H":3600,"4H":14400,"D":86400};
+  var sec=TF_SEC[tf]||300;
+  var now=new Date(), start=new Date(now.getTime()-sec*200*1000);
+  var s=start.toISOString().split(".")[0], e=now.toISOString().split(".")[0];
+  try {
+    var res=await fetch("https://corsproxy.io/?"+encodeURIComponent("https://hist.databento.com/v0/timeseries.get_range?dataset=GLBX.MDP3&symbols=MNQ.c.0&schema="+schema+"&start="+s+"&end="+e+"&encoding=json&limit=200"),{headers:{"Authorization":"Bearer "+key}});
+    if(res.status===401){state.dbError="Invalid API key";state.dbLoading=false;state.dbConnected=false;renderContent();return;}
+    if(!res.ok){state.dbError="Error "+res.status;state.dbLoading=false;renderContent();return;}
+    var text=await res.text();
+    var lines=text.trim().split("\n").filter(Boolean);
+    var bars=[];
+    lines.forEach(function(line){
+      try{var d=JSON.parse(line);if(d.open!==undefined){var sc=d.open>1e6?1e9:1;bars.push({time:new Date(d.ts_event/1e6),open:d.open/sc,high:d.high/sc,low:d.low/sc,close:d.close/sc,volume:d.volume||0});}}catch(e){}
+    });
+    var agg=TF_AGG[tf]||1;
+    if(agg>1&&bars.length>0){
+      var ab=[];
+      for(var i=0;i<bars.length;i+=agg){var ch=bars.slice(i,i+agg);if(!ch.length)continue;ab.push({time:ch[0].time,open:ch[0].open,high:Math.max.apply(null,ch.map(function(b){return b.high;})),low:Math.min.apply(null,ch.map(function(b){return b.low;})),close:ch[ch.length-1].close,volume:ch.reduce(function(s,b){return s+b.volume;},0)});}
+      bars=ab;
+    }
+    if(bars.length>0){state.candles=bars;state.livePrice=bars[bars.length-1].close;state.dbConnected=true;state.dbError="";}
+    else{state.dbError="No data - market may be closed";}
+  }catch(e){state.dbError="Fetch error: "+e.message;}
+  state.dbLoading=false;
+  renderContent();
+  if(state.dbConnected) setTimeout(drawChart,100);
+}
+
+function drawChart(){
+  var canvas=document.getElementById("liveCanvas"); if(!canvas) return;
+  var ctx=canvas.getContext("2d");
+  var W=canvas.width, H=canvas.height;
+  var PAD={t:20,r:72,b:36,l:8};
+  var chartW=W-PAD.l-PAD.r, chartH=H-PAD.t-PAD.b;
+  ctx.clearRect(0,0,W,H); ctx.fillStyle="#070707"; ctx.fillRect(0,0,W,H);
+  var vis=state.candles.slice(-80); if(!vis.length) return;
+  var pMax=Math.max.apply(null,vis.map(function(c){return c.high;}));
+  var pMin=Math.min.apply(null,vis.map(function(c){return c.low;}));
+  var oH=parseFloat(state.liveOrb.high)||0, oL=parseFloat(state.liveOrb.low)||0;
+  if(state.liveOrb.active&&oH>0&&oL>0){pMax=Math.max(pMax,oH);pMin=Math.min(pMin,oL);}
+  var pad=(pMax-pMin)*0.06; pMax+=pad; pMin-=pad;
+  var range=pMax-pMin||1;
+  function px(p){return PAD.t+chartH*(1-(p-pMin)/range);}
+  function cx(i){return PAD.l+i*(chartW/vis.length);}
+  var bw=Math.max(2,(chartW/vis.length)*0.7);
+  // Grid
+  ctx.strokeStyle="#111"; ctx.lineWidth=0.5;
+  for(var gi=0;gi<=5;gi++){var gp=pMin+range*gi/5,gy=px(gp);ctx.beginPath();ctx.moveTo(PAD.l,gy);ctx.lineTo(W-PAD.r,gy);ctx.stroke();ctx.fillStyle="#2a2a2a";ctx.font="8px monospace";ctx.textAlign="left";ctx.fillText(Math.round(gp).toLocaleString(),W-PAD.r+3,gy+3);}
+  // ORB
+  if(state.liveOrb.active&&oH>0&&oL>0){ctx.fillStyle="rgba(251,191,36,0.06)";ctx.fillRect(PAD.l,px(oH),chartW,px(oL)-px(oH));ctx.strokeStyle="#fbbf2466";ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.beginPath();ctx.moveTo(PAD.l,px(oH));ctx.lineTo(W-PAD.r,px(oH));ctx.stroke();ctx.beginPath();ctx.moveTo(PAD.l,px(oL));ctx.lineTo(W-PAD.r,px(oL));ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#fbbf24aa";ctx.font="7px monospace";ctx.textAlign="left";ctx.fillText("ORB H "+oH,PAD.l+2,px(oH)-3);ctx.fillText("ORB L "+oL,PAD.l+2,px(oL)+9);}
+  // FVGs
+  var fvgs=detectFVGs(vis);
+  fvgs.forEach(function(f){if(f.filled)return;ctx.fillStyle=f.type==="bull"?"rgba(0,255,159,0.06)":"rgba(255,61,87,0.06)";ctx.fillRect(cx(Math.min(f.idx,vis.length-1)),px(f.top),chartW,Math.abs(px(f.bot)-px(f.top)));});
+  // MAs
+  function drawLine(pts,color,dash){if(!pts||pts.length<2)return;ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.setLineDash(dash||[]);ctx.beginPath();pts.forEach(function(p,i){var x=cx(p.i!==undefined?p.i:i)+bw/2,y=px(p.v!==undefined?p.v:p);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();ctx.setLineDash([]);}
+  var e9=calcEMA(vis,9),e21=calcEMA(vis,21),e50=calcEMA(vis,50),e200=calcEMA(vis,200),vw=calcVWAP(vis);
+  if(state.maShow.ema9) drawLine(e9,"#fbbf24");
+  if(state.maShow.ema21) drawLine(e21,"#7ec8e3");
+  if(state.maShow.ema50) drawLine(e50,"#a78bfa");
+  if(state.maShow.ema200) drawLine(e200,"#ff6b35");
+  if(state.maShow.vwap) drawLine(vw.map(function(v,i){return{i:i,v:v};}),"#ff3d57",[3,2]);
+  // Candles
+  vis.forEach(function(c,i){var x=cx(i),isG=c.close>=c.open,col=isG?"#00ff9f":"#ff3d57";ctx.strokeStyle=col;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+bw/2,px(c.high));ctx.lineTo(x+bw/2,px(c.low));ctx.stroke();ctx.fillStyle=col+"cc";ctx.fillRect(x,px(Math.max(c.open,c.close)),bw,Math.max(1,Math.abs(px(c.open)-px(c.close))));});
+  // Last price
+  var last=vis[vis.length-1];
+  if(last){var lp=px(last.close),pc=last.close>=last.open?"#00ff9f":"#ff3d57";ctx.strokeStyle=pc;ctx.lineWidth=0.8;ctx.setLineDash([2,2]);ctx.beginPath();ctx.moveTo(PAD.l,lp);ctx.lineTo(W-PAD.r,lp);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=pc+"22";ctx.fillRect(W-PAD.r,lp-8,PAD.r,16);ctx.fillStyle=pc;ctx.font="bold 9px monospace";ctx.textAlign="left";ctx.fillText(last.close.toFixed(2),W-PAD.r+2,lp+3);}
+}
+
+// ── SCALP TAB ─────────────────────────────────────────────────────────────────
+function renderScalp(){
+  var score=PRETRADE.filter(function(i){return state.checks[i.id]==="yes";}).length;
+  var allDone=Object.keys(state.checks).length===PRETRADE.length;
+  var gng=score>=6?"GO":score>=4?"CAUTION":"NO GO";
+  var gc=score>=6?"#00ff9f":score>=4?"#fbbf24":"#ff3d57";
+  var items=PRETRADE.map(function(item){
+    var ans=state.checks[item.id]||"";
+    return '<div class="check-item"><div class="check-q">'+item.q+'</div><div class="check-btns"><button class="check-btn'+(ans==="yes"?" yes":"")+'" onclick="setCheck(\''+item.id+'\',\'yes\')">v '+item.bull+'</button><button class="check-btn'+(ans==="no"?" no":"")+'" onclick="setCheck(\''+item.id+'\',\'no\')">x '+item.bear+'</button></div></div>';
+  }).join("");
+  var result=allDone?'<div style="margin-top:8px;background:'+gc+'11;border:1px solid '+gc+'33;border-radius:5px;padding:8px 10px;text-align:center"><div style="font-size:14px;color:'+gc+';font-weight:700">'+gng+' - '+score+'/8 CONDITIONS MET</div><div style="font-size:9px;color:#555;margin-top:3px">'+(score>=6?"Conditions favorable. Use stops.":score>=4?"Proceed with caution. Reduce size 50%.":"Do not enter. Wait for better conditions.")+'</div></div>':"";
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:9px;color:#fbbf24;font-weight:700;letter-spacing:1px">! PRE-TRADE CHECKLIST</div><div style="font-size:7px;color:#333">Complete before every scalp entry</div></div><div style="text-align:right"><div class="gonogo" style="color:'+gc+'">'+gng+'</div><div style="font-size:8px;color:#444">'+score+'/'+PRETRADE.length+' checks</div></div></div>'+items+result+'<button onclick="resetChecks()" style="background:transparent;border:1px solid #111;color:#333;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace;margin-top:6px;display:block;width:100%">reset RESET CHECKLIST</button></div>';
+}
+function setCheck(id,val){state.checks[id]=val;renderContent();}
+function resetChecks(){state.checks={};renderContent();}
+
+// ── ORB TAB ───────────────────────────────────────────────────────────────────
+function renderORB(){
+  var typeBtns=['<div style="margin-bottom:10px"><div style="font-size:7px;color:#444;margin-bottom:4px">ORB TIMEFRAME</div><div style="display:flex;gap:6px">',
+    [["5","5-MIN ORB"],["15","15-MIN ORB"]].map(function(item){var act=state.orbType===item[0];return '<button onclick="setOrbType(\''+item[0]+'\')" style="flex:1;background:'+(act?"#ff6b3522":"transparent")+';border:1px solid '+(act?"#ff6b3555":"#1a1a1a")+';color:'+(act?"#ff6b35":"#333")+';padding:6px 0;border-radius:4px;cursor:pointer;font-size:9px;font-family:monospace;font-weight:700">'+item[1]+(act?" v":"")+'</button>';}).join(""),
+    '</div><div style="font-size:7.5px;color:#2a2a2a;margin-top:4px">'+(state.orbType==="5"?"5-min ORB: opens 9:30, closes 9:35 AM ET. Best for scalp style.":"15-min ORB: opens 9:30, closes 9:45 AM ET. Fewer fakeouts.")+'</div></div>'].join("");
+  var inputs='<div class="grid2" style="margin-bottom:8px"><div><div style="font-size:7px;color:#00ff9f;margin-bottom:3px">ORB HIGH ('+(state.orbType==="5"?"9:35 close":"9:45 close")+')</div><input id="orbHiInput" value="'+state.orbHigh+'" placeholder="e.g. 29420" class="orb-input hi" style="width:100%" oninput="state.orbHigh=this.value;state.orbSetup=null"/></div><div><div style="font-size:7px;color:#ff3d57;margin-bottom:3px">ORB LOW ('+(state.orbType==="5"?"9:35 close":"9:45 close")+')</div><input id="orbLoInput" value="'+state.orbLow+'" placeholder="e.g. 29180" class="orb-input lo" style="width:100%" oninput="state.orbLow=this.value;state.orbSetup=null"/></div></div>';
+  var calcBtn='<button onclick="calcORB()" style="width:100%;background:#ff6b3511;border:1px solid #ff6b3533;color:#ff6b35;padding:8px 0;border-radius:4px;cursor:pointer;font-size:9px;font-family:monospace;font-weight:700;letter-spacing:1px;margin-bottom:8px">! CALCULATE ORB LEVELS</button>';
+  var setup=state.orbSetup;
+  var resultsHtml="";
+  if(setup){
+    var cp=parseFloat(state.currentPrice)||0;
+    var isAbove=cp>parseFloat(setup.high),isBelow=cp<parseFloat(setup.low);
+    var statusHtml="";
+    if(cp>0){var sc=isAbove?"#00ff9f":isBelow?"#ff3d57":"#fbbf24";var st=isAbove?"ABOVE ORB - BULLISH BREAKOUT":isBelow?"BELOW ORB - BEARISH BREAKDOWN":"INSIDE ORB - WAIT FOR BREAK";statusHtml='<div style="background:'+sc+'11;border:1px solid '+sc+'33;border-radius:6px;padding:8px 12px;margin-bottom:8px;text-align:center"><div style="font-size:11px;color:'+sc+';font-weight:700">'+st+'</div></div>';}
+    var summaryHtml='<div style="background:#0a0a0a;border:1px solid #222;border-radius:6px;padding:8px 12px;margin-bottom:8px"><div style="font-size:7px;color:#ff6b35;letter-spacing:1px;margin-bottom:6px">'+state.orbType+'-MIN ORB RANGE</div><div class="grid3">'+[["HIGH",setup.high,"#00ff9f"],["MID",setup.mid,"#fbbf24"],["LOW",setup.low,"#ff3d57"],["RANGE",setup.range+" pts","#aaa"],["L-STOP",setup.longStop,"#ff3d5788"],["S-STOP",setup.shortStop,"#00ff9f88"]].map(function(item){return '<div class="stat-box" style="text-align:center;border-color:'+item[2]+'22"><div class="stat-lbl" style="color:'+item[2]+'88">'+item[0]+'</div><div style="font-size:11px;color:'+item[2]+';font-weight:700">'+item[1]+'</div></div>';}).join("")+'</div></div>';
+    var longHtml='<div style="background:#00ff9f06;border:1px solid #00ff9f22;border-radius:6px;padding:8px 12px;margin-bottom:8px"><div style="font-size:7px;color:#00ff9f;letter-spacing:1px;margin-bottom:6px">[UP] LONG TARGETS (breakout above '+setup.high+')</div><div style="font-size:8px;color:#444;margin-bottom:6px">Entry: retest ORB high on 30s + FVG fill -> long</div>'+[["T1 (+0.5R)",setup.lt1,"#00ff9f"],["T2 (+1R)",setup.lt2,"#00e676"],["T3 (+1.5R)",setup.lt3,"#00cc66"],["T4 (+2R)",setup.lt4,"#009944"]].map(function(item){var hit=cp>0&&cp>=parseFloat(item[1]);return '<div class="target-row"><div><span style="font-size:9px;color:'+item[2]+';font-weight:700">'+item[0]+'</span></div><div style="display:flex;align-items:center;gap:5px">'+(hit?'<span class="hit-badge" style="color:#00ff9f;background:#00ff9f11;border:1px solid #00ff9f33">v HIT</span>':'')+'<span style="font-size:11px;color:'+item[2]+';font-weight:700">'+item[1]+'</span></div></div>';}).join("")+'</div>';
+    var shortHtml='<div style="background:#ff3d5706;border:1px solid #ff3d5722;border-radius:6px;padding:8px 12px;margin-bottom:8px"><div style="font-size:7px;color:#ff3d57;letter-spacing:1px;margin-bottom:6px">[DN] SHORT TARGETS (breakdown below '+setup.low+')</div><div style="font-size:8px;color:#444;margin-bottom:6px">Entry: retest ORB low on 30s + FVG fill -> short</div>'+[["T1 (-0.5R)",setup.st1,"#ff3d57"],["T2 (-1R)",setup.st2,"#ff2244"],["T3 (-1.5R)",setup.st3,"#cc1133"],["T4 (-2R)",setup.st4,"#990022"]].map(function(item){var hit=cp>0&&cp<=parseFloat(item[1]);return '<div class="target-row"><div><span style="font-size:9px;color:'+item[2]+';font-weight:700">'+item[0]+'</span></div><div style="display:flex;align-items:center;gap:5px">'+(hit?'<span class="hit-badge" style="color:#ff3d57;background:#ff3d5711;border:1px solid #ff3d5733">v HIT</span>':'')+'<span style="font-size:11px;color:'+item[2]+';font-weight:700">'+item[1]+'</span></div></div>';}).join("")+'</div>';
+    var fvgHtml='<div style="background:#a78bfa08;border:1px solid #a78bfa22;border-radius:6px;padding:8px 12px;margin-bottom:8px"><div style="font-size:7px;color:#a78bfa;letter-spacing:1px;margin-bottom:6px">[FVG] FVG NOTES (30s chart)</div><div style="display:flex;gap:6px;margin-bottom:6px"><input id="fvgInput" value="'+state.fvgInput+'" placeholder="e.g. Bullish FVG at 29,410" style="flex:1;background:#111;border:1px solid #a78bfa33;color:#ddd;padding:6px 8px;border-radius:4px;font-size:9px;font-family:monospace" oninput="state.fvgInput=this.value"/><button onclick="addFVG()" style="background:#a78bfa11;border:1px solid #a78bfa33;color:#a78bfa;padding:0 10px;border-radius:4px;cursor:pointer;font-size:8px;font-family:monospace">+ ADD</button></div>'+(state.fvgNotes.length===0?'<div style="font-size:8px;color:#1a1a1a">No FVGs logged yet</div>':state.fvgNotes.map(function(n,i){return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #111"><span style="font-size:8px;color:#666">'+n.text+'</span><span style="font-size:7px;color:#222">'+n.time+'</span></div>';}).join(""))+'</div>';
+    var flowHtml='<div style="background:#fbbf2408;border:1px solid #fbbf2422;border-radius:6px;padding:8px 12px"><div style="font-size:7px;color:#fbbf24;letter-spacing:1px;margin-bottom:5px">! YOUR ORB ENTRY FLOW</div>'+["1. At 9:30 AM ET the "+state.orbType+"-min candle OPENS - do not enter yet","2. Wait for candle to close ("+(state.orbType==="5"?"9:35 AM ET":"9:45 AM ET")+")","3. Mark high ("+setup.high+") and low ("+setup.low+") as your ORB","4. Drop to 30-second chart","5. Wait for price to retest the ORB high OR low","6. Look for 3-candle FVG at that level - entry signal","7. Enter on FVG fill, stop beyond ORB (long stop: "+setup.longStop+")","8. First target T1, then trail or close at T2"].map(function(s){return '<div style="font-size:8px;color:#555;padding:3px 0;border-bottom:1px solid #111;line-height:1.4">'+s+'</div>';}).join("")+'</div>';
+    var cpHtml='<div style="margin-bottom:8px"><div style="font-size:7px;color:#444;margin-bottom:3px">CURRENT PRICE (optional)</div><input value="'+state.currentPrice+'" placeholder="e.g. 29450" style="width:100%;background:#111;border:1px solid #222;color:#ddd;padding:6px 8px;border-radius:4px;font-size:10px;font-family:monospace" oninput="state.currentPrice=this.value;renderContent()"/></div>';
+    resultsHtml=cpHtml+statusHtml+summaryHtml+longHtml+shortHtml+fvgHtml+flowHtml+'<button onclick="resetORB()" style="width:100%;background:transparent;border:1px solid #111;color:#222;padding:6px 0;border-radius:4px;cursor:pointer;font-size:7px;font-family:monospace;margin-top:8px">reset RESET ORB</button>';
+  }
+  return '<div style="font-family:monospace"><div class="card"><div style="font-size:9px;color:#ff6b35;font-weight:700;letter-spacing:1px;margin-bottom:2px">! ORB TRACKER</div><div style="font-size:8px;color:#333;margin-bottom:10px">Opening Range Breakout - enter the 9:30 candle high and low</div>'+typeBtns+inputs+calcBtn+resultsHtml+'</div></div>';
+}
+function setOrbType(t){state.orbType=t;state.orbSetup=null;renderContent();}
+function calcORB(){
+  var h=parseFloat(state.orbHigh),l=parseFloat(state.orbLow);
+  if(!h||!l||h<=l) return;
+  var r=h-l,e1=r*.5,e2=r,e3=r*1.5,e4=r*2;
+  state.orbSetup={high:h.toFixed(2),low:l.toFixed(2),range:r.toFixed(2),mid:((h+l)/2).toFixed(2),lt1:(h+e1).toFixed(2),lt2:(h+e2).toFixed(2),lt3:(h+e3).toFixed(2),lt4:(h+e4).toFixed(2),st1:(l-e1).toFixed(2),st2:(l-e2).toFixed(2),st3:(l-e3).toFixed(2),st4:(l-e4).toFixed(2),longStop:(l-r*.25).toFixed(2),shortStop:(h+r*.25).toFixed(2)};
+  renderContent();
+}
+function resetORB(){state.orbHigh="";state.orbLow="";state.orbSetup=null;state.fvgNotes=[];state.currentPrice="";renderContent();}
+function addFVG(){if(state.fvgInput.trim()){state.fvgNotes=[{text:state.fvgInput,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})},...state.fvgNotes].slice(0,5);state.fvgInput="";renderContent();}}
+
+// ── JOURNAL TAB ───────────────────────────────────────────────────────────────
+function renderJournal(){
+  var trades=state.trades;
+  var totalPnl=trades.reduce(function(s,t){return s+parseFloat(t.pnl);},0);
+  var wins=trades.filter(function(t){return parseFloat(t.pnl)>0;}).length;
+  var wr=trades.length>0?Math.round(wins/trades.length*100):0;
+  var statsHtml=trades.length>0?'<div class="grid3" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:10px">'+[["TRADES",trades.length,"#aaa"],["WIN RATE",wr+"%",wr>=50?"#00ff9f":"#ff3d57"],["P&L","$"+totalPnl.toFixed(0),totalPnl>=0?"#00ff9f":"#ff3d57"],["AVG","$"+(trades.length>0?(totalPnl/trades.length).toFixed(0):"--"),(totalPnl/trades.length)>=0?"#00e676":"#ff3d57"]].map(function(item){return '<div class="journal-stat"><div style="font-size:7px;color:#333">'+item[0]+'</div><div style="font-size:13px;color:'+item[2]+';font-weight:700">'+item[1]+'</div></div>';}).join("")+'</div>':"";
+  var formHtml=state.addingTrade?'<div style="background:#0a0a0a;border:1px solid #00ff9f22;border-radius:5px;padding:10px;margin-bottom:10px"><div style="font-size:8px;color:#00ff9f;margin-bottom:8px">LOG NEW TRADE</div><div class="grid2" style="margin-bottom:6px"><div><div style="font-size:7px;color:#444;margin-bottom:3px">SIDE</div><div style="display:flex;gap:4px">'+["LONG","SHORT"].map(function(side){return '<button onclick="setTradeSide(\''+side+'\')" style="flex:1;background:'+(state.tradeForm.side===side?(side==="LONG"?"#00ff9f22":"#ff3d5722"):"transparent")+';border:1px solid '+(state.tradeForm.side===side?(side==="LONG"?"#00ff9f44":"#ff3d5744"):"#222")+';color:'+(state.tradeForm.side===side?(side==="LONG"?"#00ff9f":"#ff3d57"):"#444")+';padding:5px 0;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace">'+side+'</button>';}).join("")+'</div></div><div><div style="font-size:7px;color:#444;margin-bottom:3px">CONTRACTS</div><input value="'+state.tradeForm.size+'" style="width:100%;background:#111;border:1px solid #222;color:#ddd;padding:5px 8px;border-radius:3px;font-size:10px;font-family:monospace" oninput="state.tradeForm.size=this.value" placeholder="1"/></div><div><div style="font-size:7px;color:#444;margin-bottom:3px">ENTRY</div><input value="'+state.tradeForm.entry+'" style="width:100%;background:#111;border:1px solid #222;color:#ddd;padding:5px 8px;border-radius:3px;font-size:10px;font-family:monospace" oninput="state.tradeForm.entry=this.value" placeholder="29200"/></div><div><div style="font-size:7px;color:#444;margin-bottom:3px">EXIT</div><input value="'+state.tradeForm.exit+'" style="width:100%;background:#111;border:1px solid #222;color:#ddd;padding:5px 8px;border-radius:3px;font-size:10px;font-family:monospace" oninput="state.tradeForm.exit=this.value" placeholder="29250"/></div></div><div style="margin-bottom:8px"><div style="font-size:7px;color:#444;margin-bottom:3px">NOTES</div><input value="'+state.tradeForm.notes+'" style="width:100%;background:#111;border:1px solid #222;color:#ddd;padding:5px 8px;border-radius:3px;font-size:9px;font-family:monospace" oninput="state.tradeForm.notes=this.value" placeholder="e.g. VWAP reclaim, MAG7 green"/></div>'+(state.tradeForm.entry&&state.tradeForm.exit?'<div style="margin-bottom:8px;padding:6px 9px;background:#111;border-radius:4px"><span style="font-size:9px;color:#555">Est. P&L: </span><span style="font-size:11px;color:'+(((state.tradeForm.side==="LONG"?parseFloat(state.tradeForm.exit)-parseFloat(state.tradeForm.entry):parseFloat(state.tradeForm.entry)-parseFloat(state.tradeForm.exit))*(parseInt(state.tradeForm.size)||1)*2)>=0?"#00ff9f":"#ff3d57")+';font-weight:700">$'+(((state.tradeForm.side==="LONG"?parseFloat(state.tradeForm.exit)-parseFloat(state.tradeForm.entry):parseFloat(state.tradeForm.entry)-parseFloat(state.tradeForm.exit))*(parseInt(state.tradeForm.size)||1)*2)).toFixed(0)+'</span></div>':'')+'<div style="display:flex;gap:6px"><button onclick="saveTrade()" style="flex:2;background:#00ff9f11;border:1px solid #00ff9f33;color:#00ff9f;padding:7px 0;border-radius:3px;cursor:pointer;font-size:9px;font-family:monospace;font-weight:700">v SAVE TRADE</button><button onclick="state.addingTrade=false;renderContent()" style="flex:1;background:transparent;border:1px solid #111;color:#333;padding:7px 0;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace">CANCEL</button></div></div>':"";
+  var tradeList=trades.slice(0,10).map(function(t){var win=parseFloat(t.pnl)>=0;return '<div class="trade-row" style="border:1px solid '+(win?"#00ff9f18":"#ff3d5718")+'"><div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:9px;color:'+(t.side==="LONG"?"#00ff9f":"#ff3d57")+';font-weight:700">'+t.side+'</span><span style="font-size:8px;color:#555">'+t.size+'ct @ '+t.entry+' -> '+t.exit+'</span><span style="font-size:7px;color:#222">'+t.time+'</span></div><div style="text-align:right"><div style="font-size:12px;color:'+(win?"#00ff9f":"#ff3d57")+';font-weight:700">$'+t.pnl+'</div><div style="font-size:7px;color:#333">'+t.pts+' pts</div></div></div>'+(t.notes?'<div style="font-size:8px;color:#333;margin-top:3px;line-height:1.3">'+t.notes+'</div>':'')+'</div>';}).join("");
+  return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div><div style="font-size:9px;color:#00ff9f;font-weight:700;letter-spacing:1px">TRADE JOURNAL</div><div style="font-size:7px;color:#333">MNQ scalp log - $2/tick/contract</div></div><button onclick="state.addingTrade=true;renderContent()" style="background:#00ff9f11;border:1px solid #00ff9f33;color:#00ff9f;padding:4px 10px;border-radius:3px;cursor:pointer;font-size:8px;font-family:monospace">+ LOG TRADE</button></div>'+statsHtml+formHtml+(trades.length===0&&!state.addingTrade?'<div style="font-size:9px;color:#2a2a2a;text-align:center;padding:20px 0">No trades logged yet. Tap + LOG TRADE after each scalp.</div>':tradeList)+(trades.length>0?'<button onclick="clearTrades()" style="background:transparent;border:1px solid #111;color:#222;padding:4px 12px;border-radius:3px;cursor:pointer;font-size:7px;font-family:monospace;margin-top:4px;display:block;width:100%">reset CLEAR ALL TRADES</button>':"")+'</div>';
+}
+function setTradeSide(s){state.tradeForm.side=s;renderContent();}
+function saveTrade(){
+  var f=state.tradeForm;
+  if(!f.entry||!f.exit) return;
+  var en=parseFloat(f.entry),ex=parseFloat(f.exit),sz=parseInt(f.size)||1;
+  var pnl=f.side==="LONG"?(ex-en)*sz*2:(en-ex)*sz*2;
+  var pts=f.side==="LONG"?(ex-en):(en-ex);
+  state.trades=[{id:Date.now(),side:f.side,entry:en,exit:ex,size:sz,notes:f.notes,pnl:pnl.toFixed(0),pts:pts.toFixed(2),time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})},...state.trades].slice(0,50);
+  state.tradeForm={side:"LONG",entry:"",exit:"",size:"1",notes:""};
+  state.addingTrade=false;
+  renderContent();
+}
+function clearTrades(){if(confirm("Clear all trades?")) {state.trades=[];renderContent();}}
+
+// ── PRICES TAB ────────────────────────────────────────────────────────────────
+function renderPrices(){
+  var mnq=LIVE.MNQ;
+  var oilAlert=getOilAlert();
+  var mag7html=MAG7.map(function(sym){var q=LIVE[sym];if(!q)return"";var up=q.chgPct>=0;return '<div style="background:#070707;border:1px solid #0d0d0d;border-radius:5px;padding:8px 10px"><div style="display:flex;justify-content:space-between"><div><div style="font-size:10px;color:'+q.color+';font-weight:700">'+sym+' w'+q.w+'</div><div style="font-size:15px;color:#e0e0e0;font-weight:700">$'+q.price.toFixed(2)+'</div></div><div style="font-size:12px;color:'+(up?"#00e676":"#ff3d57")+';font-weight:700;text-align:right">'+(up?"^":"v")+Math.abs(q.chgPct).toFixed(2)+'%</div></div></div>';}).join("");
+  return '<div style="background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:6px;padding:10px;margin-bottom:10px"><div style="font-size:8px;color:#00ff9f;margin-bottom:6px">MNQ FUTURES - '+LIVE.dataTimestamp+'</div><div class="grid3" style="margin-bottom:8px">'+[["PRICE",mnq.price.toLocaleString(),"#00ff9f"],["CHANGE","+"+mnq.chg,"#00e676"],["CHG%","+"+mnq.chgPct.toFixed(2)+"%","#00e676"],["HIGH",mnq.high.toLocaleString(),"#00ff9f"],["LOW",mnq.low.toLocaleString(),"#ff3d57"],["OPEN",mnq.open.toLocaleString(),"#888"]].map(function(item){return '<div class="stat-box"><div class="stat-lbl">'+item[0]+'</div><div class="stat-val" style="color:'+item[2]+'">'+item[1]+'</div></div>';}).join("")+'</div><div style="font-size:9px;color:#666;line-height:1.5">'+LIVE.NOTE+'</div></div>'
+  +'<div class="grid2" style="margin-bottom:10px"><div style="background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px 10px"><div style="font-size:8px;color:#a78bfa;margin-bottom:3px;font-weight:700">VIX - FEAR GAUGE</div><div style="font-size:18px;color:'+(LIVE.VIX.price<20?"#00ff9f":LIVE.VIX.price<25?"#fbbf24":"#ff3d57")+';font-weight:700">'+LIVE.VIX.price+'</div><div style="font-size:8px;color:#ff3d5777;margin-bottom:4px">^'+Math.abs(LIVE.VIX.chgPct).toFixed(2)+'%</div><div style="font-size:8px;color:#444;line-height:1.4">'+(LIVE.VIX.price<15?"Low fear - scalp friendly":LIVE.VIX.price<20?"Moderate - normal":LIVE.VIX.price<25?"Elevated - widen stops":"HIGH - reduce size")+'</div><div style="font-size:8px;color:#333;margin-top:3px;line-height:1.3">'+LIVE.VIX.note+'</div></div><div style="background:#0a0a0a;border:1px solid '+oilAlert.color+'44;border-radius:5px;padding:8px 10px"><div style="font-size:8px;color:#ff9f1c;margin-bottom:3px;font-weight:700">WTI OIL - NQ INVERSE</div><div style="font-size:18px;color:'+(LIVE.OIL.price<100?"#00ff9f":"#ff3d57")+';font-weight:700">$'+LIVE.OIL.price+'</div><div style="font-size:8px;color:#ff3d5777;margin-bottom:4px">^'+Math.abs(LIVE.OIL.chgPct).toFixed(2)+'%</div><div style="font-size:8px;color:#444;line-height:1.4">'+(LIVE.OIL.price<90?"Low oil = bullish NQ":LIVE.OIL.price<100?"Moderate - watch Iran":"Elevated - NQ headwind")+'</div><div style="font-size:8px;color:#333;margin-top:3px;line-height:1.3">'+LIVE.OIL.note+'</div></div></div>'
+  +'<div style="font-size:8px;color:#fbdd74;letter-spacing:1px;margin-bottom:8px">MAG7 DETAIL</div><div class="grid2">'+mag7html+'</div>';
+}
+
+// ── NEWS TAB ──────────────────────────────────────────────────────────────────
+function renderNews(){
+  var biasc=NEWS.overallBias==="BULL"?"#00ff9f":NEWS.overallBias==="BEAR"?"#ff3d57":"#888";
+  var srcs=NEWS.sources.map(function(src){var bc=src.bias==="BULL"?"#00ff9f":src.bias==="BEAR"?"#ff3d57":"#666";return '<div class="news-src"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="display:flex;gap:5px;align-items:center"><span style="font-size:9px;color:'+src.color+';font-weight:700;border:1px solid '+src.color+'44;border-radius:2px;padding:0 5px">'+src.name+'</span><span style="font-size:8px;color:'+bc+';font-weight:700">* '+src.bias+'</span><span style="font-size:7px;color:#222">'+src.publishedAt+'</span></div><a href="'+src.url+'" target="_blank" style="text-decoration:none;font-size:8px;color:#333">-></a></div><div class="news-hl" style="border-color:'+src.color+'44">'+src.headline+'</div><div class="news-sum">'+src.summary+'</div></div>';}).join("");
+  return '<div style="background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px 10px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:8px;color:#333">'+NEWS.asOf+'</span><span style="background:'+biasc+'1a;color:'+biasc+';border:1px solid '+biasc+'33;border-radius:3px;padding:1px 6px;font-size:8px;font-weight:700">'+NEWS.overallBias+'</span></div><div style="font-size:10px;color:#777;line-height:1.5;margin-bottom:5px">'+NEWS.mnqImplication+'</div><div style="font-size:9px;color:#ff3d5788">[!] '+NEWS.keyRisk+'</div><div style="font-size:9px;color:#ff6b3577;margin-top:3px">[BOMB] '+NEWS.tweetRisk+'</div></div>'+srcs+'<div style="background:#a78bfa08;border:1px solid #a78bfa22;border-radius:5px;padding:7px 10px"><div style="font-size:7.5px;color:#a78bfa;margin-bottom:3px">FED WATCH</div><div style="font-size:10px;color:#666;line-height:1.5">'+NEWS.fedWatch+'</div></div>';
+}
+
+// ── CHARTS TAB ────────────────────────────────────────────────────────────────
+function renderCharts(){
+  var sl=SIGNAL.scalperLevels;
+  return '<div style="font-size:9px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:8px">LIVE MNQ CHARTS - TAP TO OPEN</div>'
+  +'<div style="background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:5px;padding:7px 10px;margin-bottom:10px;display:flex;justify-content:space-between"><span style="font-size:8px;color:#555">MNQ ('+LIVE.dataTimestamp+')</span><span style="font-size:16px;color:#00ff9f;font-weight:700">'+LIVE.MNQ.price.toLocaleString()+' <span style="font-size:10px;color:#00e676">+'+LIVE.MNQ.chgPct.toFixed(2)+'%</span></span></div>'
+  +CHART_LINKS.map(function(l){return '<a href="'+l.url+'" target="_blank" class="chart-link" style="border:1px solid '+l.color+'33"><div><div style="font-size:10px;color:'+l.color+';font-weight:700">'+l.label+'</div><div style="font-size:8px;color:#444;margin-top:2px">'+l.desc+'</div></div><span style="font-size:14px;color:'+l.color+'">-></span></a>';}).join("")
+  +'<div style="background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:10px;margin-top:4px"><div style="font-size:8px;color:#fbbf24;margin-bottom:6px">KEY LEVELS</div><div class="grid3" style="margin-bottom:8px">'+[["RESISTANCE",SIGNAL.keyLevels.resistance,"#ff4444"],["SUPPORT",SIGNAL.keyLevels.support,"#00ff9f"],["PIVOT",SIGNAL.keyLevels.pivot,"#fbbf24"]].map(function(item){return '<div class="stat-box" style="border-color:'+item[2]+'22"><div class="stat-lbl">'+item[0]+'</div><div style="font-size:11px;color:'+item[2]+';font-weight:700">'+item[1]+'</div></div>';}).join("")+'</div><div style="font-size:8px;color:#fbbf24;margin-bottom:6px">SCALPER LEVELS</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">'+[["R2",sl.r2,"#ff3d57"],["R1",sl.r1,"#ff6b35"],["VWAP",sl.vwap,"#fbbf24"],["S1",sl.s1,"#00ff9f"],["S2",sl.s2,"#00d4aa"]].map(function(item){return '<div class="stat-box" style="border-color:'+item[2]+'33;text-align:center"><div style="font-size:7px;color:'+item[2]+';font-weight:700">'+item[0]+'</div><div style="font-size:11px;color:'+item[2]+';font-weight:700">'+item[1].toLocaleString()+'</div></div>';}).join("")+'</div></div>';
+}
+
+// ── SOCIAL TAB ────────────────────────────────────────────────────────────────
+function renderSocial(){
+  var traders=NQ_TRADERS.map(function(a){return '<a href="https://x.com/'+a.h+'" target="_blank" class="social-row"><div style="flex-shrink:0;min-width:118px"><div style="font-size:9px;color:#1d9bf0;font-weight:700">@'+a.h+' -></div><div style="font-size:8px;color:#00ff9f;font-weight:700;margin-top:1px">'+a.label+'</div></div><div style="font-size:9px;color:#444;line-height:1.5">'+a.why+'</div></a>';}).join("");
+  var bombList=BOMBS.map(function(a){return '<a href="https://x.com/'+a.h+'" target="_blank" class="bomb-row"><div style="flex-shrink:0;min-width:118px"><div style="font-size:9px;color:#ff3d57;font-weight:700">@'+a.h+' -></div><div style="font-size:8px;color:#ff1a1a;font-weight:700;margin-top:1px">'+a.label+'</div></div><div style="font-size:9px;color:#663333;line-height:1.5">'+a.why+'</div></a>';}).join("");
+  var schedule=[["7:00-9:30 AM ET","PRE-MARKET PREP","Check all NQ traders + bombs. Plan levels. No trades until 9:30."],["9:30-10:30 AM ET","BEST SCALP WINDOW","Highest volume, clearest moves. First hour is king."],["10:30 AM-12 PM","CHOP ZONE","Often choppy. Reduce size or sit out."],["2:00-4:00 PM ET","AFTERNOON WINDOW","Second best window. Follow MAG7 + VWAP."],["3:00-4:00 AM ET","LONDON OPEN","Best overnight session for scalps. High vol."]].map(function(s){return '<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #1a1a1a"><div style="flex-shrink:0;min-width:110px"><div style="font-size:8px;color:#fbbf24;font-weight:700">'+s[0]+'</div><div style="font-size:7px;color:#333">'+s[1]+'</div></div><div style="font-size:9px;color:#444;line-height:1.5">'+s[2]+'</div></div>';}).join("");
+  return '<div style="font-size:9px;color:#1d9bf0;font-weight:700;letter-spacing:1px;margin-bottom:4px">NQ SOCIAL SENTIMENT</div><div style="font-size:8px;color:#2a2a2a;margin-bottom:10px;line-height:1.5">Check 3+ traders before entry. Check BOMBS before every single trade.</div><div style="font-size:7.5px;color:#00ff9f;letter-spacing:1px;margin-bottom:6px">> NQ/FUTURES TRADERS</div>'+traders+'<div style="font-size:7.5px;color:#ff3d57;letter-spacing:1px;margin-bottom:6px;margin-top:12px">[BOMB] CHECK BEFORE EVERY SCALP</div>'+bombList+'<div style="background:#111;border:1px solid #222;border-radius:5px;padding:10px;margin-top:12px"><div style="font-size:7.5px;color:#fbbf24;margin-bottom:6px">[CLK] SCALPER SESSION GUIDE</div>'+schedule+'</div>';
+}
+
+// ── MISC ──────────────────────────────────────────────────────────────────────
+function copyRefresh(){
+  if(navigator.clipboard) navigator.clipboard.writeText("Requesting refresh").then(function(){alert("Copied! Paste into Claude chat.");}).catch(function(){alert('Type: "Requesting refresh" in Claude chat');});
+  else alert('Type: "Requesting refresh" in Claude chat');
+}
+
+function attachHandlers(){
+  if(state.tab==="live"&&state.dbConnected){
+    setTimeout(drawChart,50);
+    if(!window._dbInterval){
+      window._dbInterval=setInterval(function(){
+        if(state.dbConnected&&state.tab==="live") fetchDatabento(state.dbKey,state.tf);
+      },5000);
+    }
+  }
+}
+
+// -- LOCALSTORAGE - save/load API key -----------------------------------------
+function saveKey(key){
+  try{ localStorage.setItem("db_api_key", key); } catch(e){}
+}
+function loadKey(){
+  try{ return localStorage.getItem("db_api_key")||""; } catch(e){ return ""; }
+}
+function clearKey(){
+  try{ localStorage.removeItem("db_api_key"); } catch(e){}
+}
+
+// -- INIT ----------------------------------------------------------------------
+// Load saved API key on startup
+var savedKey = loadKey();
+if(savedKey){
+  state.dbKey = savedKey;
+  state.dbLoading = true;
+  setTimeout(function(){
+    fetchDatabento(savedKey, state.tf);
+  }, 800);
+}
+
+renderMag7();
+renderTabs();
+renderContent();
+setInterval(updateClock, 1000);
+updateClock();
+renderMag7();
+renderTabs();
+renderContent();
+setInterval(updateClock, 1000);
+updateClock();
+</script>
+
+</body>
+</html>
