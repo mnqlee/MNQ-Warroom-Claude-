@@ -2000,6 +2000,75 @@ function updateSignalMeter(){
 }
 
 
+// ── PRETRADE CHECKLIST DATA ──────────────────────────────────────────────────
+var PRETRADE = [
+  {id:"signal",   label:"Signal meter checked",          warn:"Check SIGNAL tab first"},
+  {id:"news",     label:"No major data release today",   warn:"CPI/PPI/Fed = skip or wait for print"},
+  {id:"trump",    label:"@realDonaldTrump checked",      warn:"Check last 15 min before every entry"},
+  {id:"oil",      label:"Oil alert checked",             warn:"SPIKE UP = avoid longs"},
+  {id:"vix",      label:"VIX below 25",                 warn:"Above 25 = skip session"},
+  {id:"killzone", label:"In NY kill zone 9:30-11 AM",   warn:"Outside kill zone = lower probability"},
+  {id:"size",     label:"Max 5 contracts confirmed",     warn:"Never exceed 5 contracts"},
+  {id:"loss",     label:"Daily loss under $400",         warn:"At $400 = done for day"}
+];
+
+// ── LIVE TAB ──────────────────────────────────────────────────────────────────
+function renderLive(){
+  var streamlitUrl = "https://mnq-live-chart-auxqzk2bya5bvb3onyxn7y.streamlit.app/";
+  return "<div style='font-family:monospace'>"
+    + "<div style='font-size:9px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:10px'>LIVE MNQ CHART</div>"
+
+    // Big launch button
+    + "<a href='" + streamlitUrl + "' target='_blank' style='display:block;background:#00ff9f22;border:2px solid #00ff9f66;border-radius:8px;padding:18px;text-align:center;text-decoration:none;margin-bottom:12px'>"
+    + "<div style='font-size:13px;color:#00ff9f;font-weight:700;letter-spacing:2px'>* OPEN LIVE MNQ CHART</div>"
+    + "<div style='font-size:8px;color:#555;margin-top:4px'>Live candles + ORB zones + FVG detection + VWAP</div>"
+    + "<div style='font-size:7px;color:#333;margin-top:2px'>Databento feed - enter API key in sidebar</div>"
+    + "</a>"
+
+    // Current price summary
+    + "<div style='background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:5px;padding:10px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center'>"
+    + "<div><div style='font-size:7px;color:#555;margin-bottom:2px'>MNQ (" + LIVE.dataTimestamp + ")</div>"
+    + "<div style='font-size:8px;color:#444'>" + LIVE.NOTE + "</div></div>"
+    + "<div style='text-align:right'><div style='font-size:20px;color:#00ff9f;font-weight:700'>" + LIVE.MNQ.price.toLocaleString() + "</div>"
+    + "<div style='font-size:10px;color:" + (LIVE.MNQ.chgPct >= 0 ? "#00e676" : "#ff3d57") + ";font-weight:700'>"
+    + (LIVE.MNQ.chgPct >= 0 ? "+" : "") + LIVE.MNQ.chgPct.toFixed(2) + "%</div></div>"
+    + "</div>"
+
+    // Key levels
+    + "<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:10px;margin-bottom:10px'>"
+    + "<div style='font-size:7px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:6px'>KEY LEVELS FOR TODAY</div>"
+    + [
+        ["R2", SIGNAL.scalperLevels.r2, "#ff3d57"],
+        ["R1", SIGNAL.scalperLevels.r1, "#ff6b35"],
+        ["VWAP", SIGNAL.scalperLevels.vwap, "#fbbf24"],
+        ["S1", SIGNAL.scalperLevels.s1, "#00ff9f"],
+        ["S2", SIGNAL.scalperLevels.s2, "#00d4aa"]
+      ].map(function(l){
+        return "<div style='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #0d0d0d'>"
+          + "<span style='font-size:8px;color:" + l[2] + ";font-weight:700'>" + l[0] + "</span>"
+          + "<span style='font-size:10px;color:" + l[2] + ";font-weight:700'>" + l[1].toLocaleString() + "</span>"
+          + "</div>";
+      }).join("")
+    + "</div>"
+
+    // How to use
+    + "<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:10px'>"
+    + "<div style='font-size:7px;color:#a78bfa;font-weight:700;letter-spacing:1px;margin-bottom:6px'>HOW TO USE THE LIVE CHART</div>"
+    + [
+        "1. Open chart above and enter Databento API key in sidebar",
+        "2. Select your timeframe (5m for ORB, 30s for entry)",
+        "3. After 9:35 AM ET - enter ORB High and Low in sidebar",
+        "4. Chart draws the ORB zone automatically",
+        "5. Drop to 30s chart - wait for FVG retest at ORB boundary",
+        "6. VWAP must be on same side as your trade direction",
+        "7. Enter on FVG fill - 5 contracts - stop at ORB boundary"
+      ].map(function(s){
+        return "<div style='font-size:8px;color:#444;padding:2px 0;border-bottom:1px solid #0a0a0a'>" + s + "</div>";
+      }).join("")
+    + "</div>"
+    + "</div>";
+}
+
 function renderScalp(){
   var score=PRETRADE.filter(function(i){return state.checks[i.id]==="yes";}).length;
   var allDone=Object.keys(state.checks).length===PRETRADE.length;
