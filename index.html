@@ -34,7 +34,7 @@ button:active{opacity:.6}
 .disclaimer{background:#080800;border-bottom:1px solid #fbbf2411;padding:2px 12px;font-size:7.5px;color:#fbbf2455;flex-shrink:0}
 .mag7-strip{border-bottom:1px solid #0a0a0a;padding:2px 10px;background:#050505;flex-shrink:0}
 .mag7-inner{display:flex;align-items:center;gap:6px}
-.mag7-lbl{font-size:7px;color:#1a1a1a;letter-spacing:2px;flex-shrink:0}
+.mag7-lbl{font-size:7px;color:#1a1a1a;letter-spacing:2px;flex-shrink:0;min-width:36px}
 .mag7-cards{flex:1;display:flex;gap:3px;overflow-x:auto}
 .mag7-card{background:#0a0a0a;border:1px solid #111;border-radius:3px;padding:2px 6px;flex-shrink:0}
 .mag7-sym{font-size:8px;font-weight:700}
@@ -81,9 +81,23 @@ button:active{opacity:.6}
 .journal-stat{background:#0a0a0a;border:1px solid #0d0d0d;border-radius:4px;padding:5px 7px}
 .trade-row{background:#080808;border-radius:4px;padding:7px 9px;margin-bottom:4px}
 .signal-badge{font-size:7px;border-radius:2px;padding:1px 5px;margin:2px}
-.social-row{background:#080808;border:1px solid #0f0f0f;border-radius:4px;padding:7px 10px;display:flex;gap:8px;margin-bottom:4px;text-decoration:none}
-.bomb-row{background:#ff3d5705;border:1px solid #ff3d5720;border-radius:4px;padding:7px 10px;display:flex;gap:8px;margin-bottom:4px;text-decoration:none}
+
 .chart-link{background:#0d0d0d;border-radius:5px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;text-decoration:none}
+/* analytics */
+.anl-adherence{font-size:52px;font-weight:700;letter-spacing:-1px;line-height:1;text-align:center}
+.anl-adherence-lbl{font-size:8px;letter-spacing:3px;text-align:center;margin-top:2px;font-weight:700}
+.anl-table{width:100%;border-collapse:collapse;font-size:8px}
+.anl-table th{background:#0a0a0a;padding:5px 7px;text-align:center;font-size:7px;color:#555;letter-spacing:1px;border:1px solid #111}
+.anl-table td{padding:6px 7px;text-align:center;border:1px solid #111;vertical-align:top}
+.anl-cell-pos{background:#00ff9f08;border-color:#00ff9f33!important}
+.anl-cell-neg{background:#ff3d5708;border-color:#ff3d5733!important}
+.anl-cell-insuf{background:#0a0a0a;color:#333}
+.anl-kelly{text-align:center;padding:8px}
+.anl-kelly-f{font-size:22px;font-weight:700}
+.anl-counter{background:#fbbf2408;border:1px solid #fbbf2422;border-radius:5px;padding:7px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.anl-rulebreak{background:#ff3d5706;border:1px solid #ff3d5720;border-radius:4px;padding:6px 9px;margin-bottom:4px}
+input[type=select]{font-family:monospace}
+select{font-family:monospace;outline:none}
 </style>
 </head>
 <body>
@@ -121,12 +135,13 @@ button:active{opacity:.6}
 <div class="stale-bar" id="staleBar">DATA OLD - Tap REQUEST REFRESH above</div>
 <div class="disclaimer" id="disclaimerBar">! May 22, 2026 EOD - NQ 29,891 +0.42% 1-week highs. VIX 15.32 CALM. Oil $96.60 -8% week. Iran deal progressing. ATH 29,734 key resistance Mon. VERIFY ON BARCHART . NOT FINANCIAL ADVICE . USE STOPS</div>
 <div class="mag7-strip">
+  <span class="mag7-lbl">MAG7</span>
   <div class="mag7-inner">
-    <span class="mag7-lbl">MAG7</span>
     <div class="mag7-cards" id="mag7Cards"></div>
     <div class="wtd-blk"><div class="wtd-lbl">WTD</div><div class="wtd-val" id="wtdVal" style="color:#00e676">+1.47%</div></div>
   </div>
 </div>
+<div class="mag7-strip" id="macroStrip" style="border-top:1px solid #050505"><div class="mag7-inner"></div></div>
 <div style="display:flex;gap:4px;padding:4px 10px;background:#050505;border-bottom:1px solid #0a0a0a;overflow-x:auto" id="mktSwitcher"></div>
 <div class="tabs" id="tabBar"></div>
 <div class="content" id="content"></div>
@@ -224,22 +239,6 @@ var SIGNAL = {
   dataQuality: "May 22 EOD - Barchart + Yahoo Finance + CNBC. Verify on Barchart."
 };
 
-var NQ_TRADERS = [
-  {h:"TradingWithAB",  label:"NQ Levels",    why:"Direct MNQ long/short entries and key levels"},
-  {h:"mercenaryjack",  label:"Tape Reading",  why:"Short-term momentum and scalp tape reads"},
-  {h:"NorthmanTrader", label:"HTF Bias",      why:"Higher timeframe NQ bull/bear structure"},
-  {h:"OptionsHawk",    label:"Smart Money",   why:"Dark pool + unusual options flow on NQ/QQQ"},
-  {h:"unusual_whales", label:"Inst. Flow",    why:"Congress trades and institutional positioning"},
-  {h:"LiveSquawk",     label:"Breaking News", why:"Real-time macro headlines - critical for scalpers"},
-  {h:"zerohedge",      label:"Bearish Macro", why:"Contrarian signals, liquidity warnings"}
-];
-
-var BOMBS = [
-  {h:"realDonaldTrump",label:"TARIFF BOMB", why:"Posts move NQ +/-400pts instantly. CHECK BEFORE EVERY SCALP."},
-  {h:"elonmusk",       label:"VOL SPIKE",   why:"TSLA/DOGE/macro - triggers rapid vol."},
-  {h:"federalreserve", label:"RATE SHOCK",  why:"Unscheduled Fed statement = NQ +/-300pts."},
-  {h:"WhiteHouse",     label:"POLICY RISK", why:"Tech regulation, AI policy, tariff executive orders."}
-];
 
 var CHART_LINKS = [
   {label:"LIVE MNQ Chart",   url:"https://mnq-live-chart-auxqzk2bya5bvb3onyxn7y.streamlit.app/", color:"#00ff9f", desc:"Live candles + ORB + FVG + VWAP - YOUR CHART"},
@@ -262,7 +261,7 @@ var state = {
       notes:"MSB + Break-Retest-Reject at ORB boundary. T1 29,150 (+118pts x3c), T2 29,050 (+218pts x2c). Paper trade."
     }
   ],
-  tradeForm: { side:"LONG", entry:"", exit:"", size:"1", notes:"" },
+  tradeForm: { side:"LONG", entry:"", exit:"", size:"1", notes:"", action:"TRADED", setup_grade:"Aplus", regime:"CALM", stop:"", t1:"", signal_score_pre:"", rules_followed:"YES", skip_reason:"" },
   addingTrade: false,
   currentPrice: "",
   orbSetup: null,
@@ -569,8 +568,8 @@ var SIGNAL_ENGINE = {
 
     var conviction,convColor;
     if(composite>=75){conviction="STRONG LONG";convColor="#00ff9f";}
-    else if(composite>=65){conviction="LEAN LONG";convColor="#00e676";}
-    else if(composite>=55){conviction="MILD LONG BIAS";convColor="#7ec8e3";}
+    else if(composite>=60){conviction="LEAN LONG";convColor="#00e676";}
+    else if(composite>=50){conviction="MILD LONG BIAS";convColor="#7ec8e3";}
     else if(composite>=45){conviction="NEUTRAL - WAIT";convColor="#fbbf24";}
     else if(composite>=35){conviction="MILD SHORT BIAS";convColor="#ff9f1c";}
     else if(composite>=25){conviction="LEAN SHORT";convColor="#ff6b35";}
@@ -579,7 +578,7 @@ var SIGNAL_ENGINE = {
     var recommendation="",recColor="#555";
     if(composite>=70&&activeKZ){recommendation="HIGH PROBABILITY LONG - Kill zone active. ORB break above + VWAP + MSB retest.";recColor="#00ff9f";}
     else if(composite<=30&&activeKZ){recommendation="HIGH PROBABILITY SHORT - Kill zone active. ORB break below + VWAP + MSB retest.";recColor="#ff3d57";}
-    else if(composite>=65){recommendation="LONG BIAS - Wait for kill zone + ORB high breakout.";recColor="#00e676";}
+    else if(composite>=60){recommendation="LONG BIAS - Wait for kill zone + ORB high breakout.";recColor="#00e676";}
     else if(composite<=35){recommendation="SHORT BIAS - Wait for kill zone + ORB low breakdown.";recColor="#ff6b35";}
     else{recommendation="NEUTRAL - No edge. Sit on hands. Wait for ORB confirmation.";recColor="#fbbf24";}
 
@@ -589,15 +588,13 @@ var SIGNAL_ENGINE = {
 
 var TABS = [
   {id:"signal",  label:"SIGNAL",  color:"#a78bfa"},
-  {id:"entry",   label:"ENTRY",   color:"#00ff9f"},
   {id:"live",    label:"LIVE",    color:"#00d4aa"},
   {id:"scalp",   label:"SCALP",   color:"#fbbf24"},
   {id:"orb",     label:"ORB",     color:"#ff6b35"},
   {id:"journal", label:"JOURNAL", color:"#00ff9f"},
-  {id:"prices",  label:"PRICES",  color:"#fbdd74"},
+  {id:"reference",label:"CHARTS",color:"#00d4aa"},
   {id:"news",    label:"NEWS",    color:"#ff6b35"},
-  {id:"charts",  label:"CHARTS",  color:"#00d4aa"},
-  {id:"social",  label:"SOCIAL",  color:"#1d9bf0"}
+  {id:"analytics",label:"ANALYTICS",color:"#fbbf24"}
 ];
 
 function setMarket(m){activeMarket=m;mktInputs.activeMarket=m;renderMktSwitcher();if(state.tab==="signal")renderContent();}
@@ -615,6 +612,12 @@ function getOilAlert(){
   if(chg>=2)return dir==="up"?{level:"SPIKE UP",color:"#ff3d57",action:"AVOID LONGS"}:{level:"SPIKE DOWN",color:"#00ff9f",action:"LEAN LONG"};
   if(chg>=1)return dir==="up"?{level:"MOVING UP",color:"#fbbf24",action:"TIGHTEN STOPS"}:{level:"MOVING DOWN",color:"#00d4aa",action:"MILD TAILWIND"};
   return {level:"QUIET",color:"#888",action:"IGNORE OIL"};
+}
+function getRegime(){
+  var vix=LIVE.VIX.price||20, ret20=parseFloat(mktInputs.ret20d)||0;
+  var isChop=ret20>=-3&&ret20<=3;
+  if(isChop)return vix<18?{name:"LOW VOL CHOP",color:"#fbbf24",warn:true}:{name:"HIGH VOL CHOP",color:"#ff6b35",warn:false};
+  return ret20>3?{name:"TRENDING UP",color:"#00ff9f",warn:false}:{name:"TRENDING DOWN",color:"#ff3d57",warn:false};
 }
 function calcEMA(data,period){if(data.length<period)return[];var k=2/(period+1),emas=[],sum=data.slice(0,period).reduce(function(a,b){return a+b.close;},0);emas.push({i:period-1,v:sum/period});for(var i=period;i<data.length;i++)emas.push({i:i,v:data[i].close*k+emas[emas.length-1].v*(1-k)});return emas;}
 function calcVWAP(data){var ct=0,cv=0;return data.map(function(c){ct+=(c.high+c.low+c.close)/3*(c.volume||1);cv+=(c.volume||1);return ct/cv;});}
@@ -640,6 +643,36 @@ function renderMag7(){
   var wv=document.getElementById("wtdVal");if(wv){var w=wtd/tw;wv.textContent=(w>=0?"+":"")+w.toFixed(2)+"%";wv.style.color=w>=0?"#00e676":"#ff3d57";}
 }
 
+function renderMacroStrip(){
+  var el=document.getElementById("macroStrip");if(!el)return;
+  var vixP=LIVE.VIX.price,vixC=LIVE.VIX.chgPct;
+  var vixCol=vixP<16?"#00ff9f":vixP<20?"#fbbf24":"#ff3d57";
+  var goldP=parseFloat(mktInputs.goldPrice)||0,goldC=parseFloat(mktInputs.goldChg)||0;
+  var dxy=parseFloat(mktInputs.dxy)||0,dxyPrev=parseFloat(mktInputs.dxyPrev)||dxy;
+  var dxyC=dxy&&dxyPrev?((dxy-dxyPrev)/dxyPrev*100):0;
+  var oilP=LIVE.OIL.price,oilC=LIVE.OIL.chgPct;
+  var oilCol=oilC>=0?"#ff3d57":"#00ff9f";
+  var yld=parseFloat(mktInputs.yield10)||0,yldPrev=parseFloat(mktInputs.yield10Prev)||yld;
+  var yldC=yld&&yldPrev?((yld-yldPrev)/yldPrev*100):0;
+  var jpyP=parseFloat(mktInputs.jpyPrice)||0,jpyC=parseFloat(mktInputs.jpyChg)||0;
+  var eurP=parseFloat(mktInputs.eurPrice)||0,eurC=parseFloat(mktInputs.eurChg)||0;
+  function box(sym,price,chg,col,disp){
+    if(!price)return "";
+    var up=chg>=0,cc=up?"#00e676":"#ff3d57";
+    return "<div class='mag7-card'><div class='mag7-sym' style='color:"+col+"'>"+sym+"</div><div class='mag7-price'>"+(disp||price.toLocaleString())+"</div><div class='mag7-pct' style='color:"+cc+"'>"+(up?"+":"")+chg.toFixed(2)+"%</div></div>";
+  }
+  var html="<span class='mag7-lbl'>MACRO</span><div class='mag7-cards'>";
+  html+=box("VIX",vixP,vixC,vixCol);
+  html+=box("GOLD",goldP,goldC,"#fbbf24","$"+goldP.toFixed(0));
+  html+=box("DXY",dxy,dxyC,"#ff6b35");
+  html+=box("OIL",oilP,oilC,oilCol,"$"+oilP.toFixed(2));
+  html+=box("10Y",yld,yldC,"#ff3d57",yld.toFixed(2)+"%");
+  html+=box("JPY",jpyP,jpyC,"#7ec8e3");
+  html+=box("EUR",eurP,eurC,"#a78bfa",eurP.toFixed(4));
+  html+="</div>";
+  el.innerHTML=html;
+}
+
 function renderTabs(){
   var html="";
   TABS.forEach(function(t){var act=state.tab===t.id;html+='<button class="tab-btn'+(act?" active":"")+'" style="--tc:'+t.color+';--tbg:'+t.color+'0a" onclick="setTab(\''+t.id+'\')">'+t.label+'</button>';});
@@ -650,60 +683,14 @@ function setTab(id){state.tab=id;renderTabs();renderContent();}
 function renderContent(){
   var el=document.getElementById("content");if(!el)return;
   if(state.tab==="signal")el.innerHTML=renderSignal();
-  else if(state.tab==="entry")el.innerHTML=renderEntry();
   else if(state.tab==="live")el.innerHTML=renderLive();
   else if(state.tab==="scalp")el.innerHTML=renderScalp();
   else if(state.tab==="orb")el.innerHTML=renderORB();
   else if(state.tab==="journal")el.innerHTML=renderJournal();
-  else if(state.tab==="prices")el.innerHTML=renderPrices();
+  else if(state.tab==="reference")el.innerHTML=renderReference();
   else if(state.tab==="news")el.innerHTML=renderNews();
-  else if(state.tab==="charts")el.innerHTML=renderCharts();
-  else if(state.tab==="social")el.innerHTML=renderSocial();
+  else if(state.tab==="analytics")el.innerHTML=renderAnalytics();
   attachHandlers();
-}
-
-// -- ENTRY TAB ----------------------------------------------------------------
-function renderEntry(){
-  var workflowHtml='<div style="background:#00ff9f0a;border:2px solid #00ff9f44;border-radius:6px;padding:10px 12px;margin-bottom:10px">'
-    +'<div style="font-size:8px;color:#00ff9f;font-weight:700;letter-spacing:2px;margin-bottom:6px">WARROOM SCALP WORKFLOW - JST</div>'
-    +'<div style="display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center">'
-    +'<span style="font-size:11px;color:#fbbf24;font-weight:700">10:25 PM JST</span>'
-    +'<span style="font-size:8px;color:#aaa">Send 15-min chart screenshot to Claude</span>'
-    +'<span style="font-size:11px;color:#fbbf24;font-weight:700">10:35 PM JST</span>'
-    +'<span style="font-size:8px;color:#aaa">Send ORB High + Low numbers</span>'
-    +'<span style="font-size:11px;color:#00ff9f;font-weight:700">60 SEC</span>'
-    +'<span style="font-size:8px;color:#aaa">Entry card returned by Claude</span>'
-    +'</div>'
-    +'<div style="margin-top:7px;padding-top:7px;border-top:1px solid #00ff9f22">'
-    +'<span style="font-size:7px;color:#00ff9f;font-weight:700;letter-spacing:1px">PATTERN: </span>'
-    +'<span style="font-size:8px;color:#00d4aa;font-weight:700">MSB + Break-Retest-Reject at ORB boundary</span>'
-    +'</div></div>';
-
-  var steps=[
-    {num:"01",time:"PRE-MARKET",color:"#a78bfa",title:"WARROOM BRIEF",items:["Check SIGNAL tab - bias and composite score","Check oil alert - SPIKE UP = avoid longs","Check VIX - above 25 = skip session entirely","Check NEWS tab - any CPI/PPI/Fed today","Check SOCIAL tab - @realDonaldTrump last 15 min","Set your target and stop BEFORE open - write it down"],rule:"If VIX > 25 or major data release in next 30 min = NO TRADING",ruleColor:"#ff3d57"},
-    {num:"02",time:"9:30-9:35 AM ET / 10:30-10:35 PM JST",color:"#fbbf24",title:"WATCH - DO NOTHING",items:["Do NOT enter any trade during this candle","Watch the 5-min candle form on your platform","Note if price is above or below VWAP","Feel the energy - aggressive or choppy","Note the opening range developing","Send 15-min chart screenshot to Claude at 10:25 PM JST"],rule:"HANDS OFF THE KEYBOARD - observation only",ruleColor:"#fbbf24"},
-    {num:"03",time:"9:35 AM ET / 10:35 PM JST",color:"#ff6b35",title:"MARK ORB + SEND TO CLAUDE",items:["5-min candle closes - immediately mark High and Low","Enter ORB High and Low into ORB tab in warroom","Send ORB numbers to Claude - entry card back in 60 sec","Note range size - less than 30 pts = skip session","Note VWAP position relative to ORB"],rule:"ORB range under 30 pts = choppy day = NO TRADING",ruleColor:"#fbbf24"},
-    {num:"04",time:"9:35-9:50 AM ET",color:"#00d4aa",title:"VWAP FILTER - QUALIFY THE TRADE",items:["ORB breaks UP + price ABOVE VWAP = LONG bias confirmed","ORB breaks UP + price BELOW VWAP = SKIP - fighting VWAP","ORB breaks DOWN + price BELOW VWAP = SHORT bias confirmed","ORB breaks DOWN + price ABOVE VWAP = SKIP - fighting VWAP","Wait for candle BODY to close beyond ORB - wicks dont count"],rule:"VWAP must be on same side as your trade - no exceptions",ruleColor:"#00d4aa"},
-    {num:"05",time:"RETEST",color:"#00ff9f",title:"ENTRY TRIGGER - MSB + BREAK-RETEST-REJECT",items:["Drop to 30-second chart after ORB breakout confirmed","Wait for price to RETEST the ORB boundary it just broke","Look for MSB (Market Structure Break) at ORB level","Break-Retest-Reject = price breaks, pulls back, rejects","FVG forming at retest = highest conviction entry","Enter on rejection - stop just beyond ORB boundary (20-25 ticks)"],rule:"No MSB + Retest-Reject at ORB = no trade",ruleColor:"#00ff9f"},
-    {num:"06",time:"IN TRADE",color:"#00ff9f",title:"TRADE MANAGEMENT",items:["5 contracts enter - never add more","At T1 (0.5x range) - close 3 contracts, move stop to breakeven","At T2 (1x range) - close remaining 2 contracts","If stop hits - DONE FOR DAY - platform closes immediately","Maximum 2 trades per day - win or lose","Daily stop loss $400 - if hit, done for day"],rule:"ONE STOP HIT = DONE FOR DAY - no revenge, no exceptions",ruleColor:"#ff3d57"}
-  ];
-
-  var disqualifiers=[["VIX ABOVE 25","Skip entire session - too volatile"],["OIL SPIKE UP alert","Avoid longs - NQ headwind"],["CPI/PPI/Fed day","Wait until AFTER print - never trade into data"],["Trump tweet in last 15 min","Wait 2 full candles before entering"],["ORB range under 30 pts","Too tight - no momentum, skip session"],["First candle massive spike","Too volatile - wait for range to develop"],["Already hit daily $400 loss","Done for day - close platform"],["Already took 2 trades today","Done for day - regardless of outcome"]];
-
-  var vwapRules=[["LONG SETUP","ORB breaks UP","Price ABOVE VWAP","#00ff9f","TAKE IT"],["LONG SKIP","ORB breaks UP","Price BELOW VWAP","#ff3d57","SKIP IT"],["SHORT SETUP","ORB breaks DOWN","Price BELOW VWAP","#00ff9f","TAKE IT"],["SHORT SKIP","ORB breaks DOWN","Price ABOVE VWAP","#ff3d57","SKIP IT"]];
-
-  var stepHtml=steps.map(function(s){
-    var items=s.items.map(function(i){return '<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid #0d0d0d"><span style="color:'+s.color+';font-size:9px;flex-shrink:0">></span><span style="font-size:9px;color:#666;line-height:1.4">'+i+'</span></div>';}).join('');
-    return '<div style="background:#070707;border:1px solid #111;border-left:3px solid '+s.color+';border-radius:5px;padding:10px 12px;margin-bottom:8px"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="font-size:16px;color:'+s.color+';font-weight:700">'+s.num+'</span><div><div style="font-size:10px;color:'+s.color+';font-weight:700">'+s.title+'</div><div style="font-size:7px;color:#333">'+s.time+'</div></div></div>'+items+'<div style="margin-top:6px;background:'+s.ruleColor+'11;border:1px solid '+s.ruleColor+'33;border-radius:3px;padding:4px 8px"><span style="font-size:8px;color:'+s.ruleColor+';font-weight:700">! RULE: '+s.rule+'</span></div></div>';
-  }).join('');
-
-  var vwapHtml='<div style="background:#070707;border:1px solid #00d4aa22;border-radius:5px;padding:10px;margin-bottom:8px"><div style="font-size:8px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:8px">VWAP FILTER - THE ONE RULE THAT SAVES ACCOUNTS</div>'+vwapRules.map(function(r){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #0d0d0d"><div style="display:flex;gap:6px;align-items:center"><span style="font-size:7px;color:#333;min-width:70px">'+r[0]+'</span><span style="font-size:8px;color:#aaa">'+r[1]+'</span><span style="font-size:7px;color:#333">+</span><span style="font-size:8px;color:#aaa">'+r[2]+'</span></div><span style="font-size:9px;color:'+r[3]+';font-weight:700;border:1px solid '+r[3]+'44;border-radius:2px;padding:1px 6px">'+r[4]+'</span></div>';}).join('')+'</div>';
-
-  var dqHtml='<div style="background:#ff3d5708;border:1px solid #ff3d5722;border-radius:5px;padding:10px;margin-bottom:8px"><div style="font-size:8px;color:#ff3d57;font-weight:700;letter-spacing:1px;margin-bottom:6px">[X] DISQUALIFIERS - ANY OF THESE = NO TRADE</div>'+disqualifiers.map(function(d){return '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #1a1a1a"><span style="font-size:8px;color:#ff3d57;font-weight:700;min-width:140px;flex-shrink:0">'+d[0]+'</span><span style="font-size:8px;color:#444;line-height:1.4">'+d[1]+'</span></div>';}).join('')+'</div>';
-
-  var rulesHtml='<div style="background:#00ff9f08;border:1px solid #00ff9f22;border-radius:5px;padding:10px;margin-bottom:8px"><div style="font-size:8px;color:#00ff9f;font-weight:700;letter-spacing:1px;margin-bottom:6px">YOUR DAILY RULES - READ EVERY MORNING</div>'+['5 CONTRACTS MAXIMUM - never add, never increase','2 TRADES PER DAY - win or lose, done after 2','$400 DAILY STOP LOSS - if hit, platform closes','ONE STOP HIT = DONE FOR DAY - no revenge ever','NO TRADING INTO DATA - CPI, PPI, Fed = wait for print','CHECK WARROOM BEFORE EVERY SINGLE ENTRY'].map(function(r,i){return '<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #0d0d0d;align-items:center"><span style="font-size:10px;color:#00ff9f;font-weight:700;flex-shrink:0">'+(i+1)+'.</span><span style="font-size:9px;color:#777;font-weight:700">'+r+'</span></div>';}).join('')+'</div>';
-
-  return '<div style="font-family:monospace"><div style="font-size:9px;color:#00ff9f;font-weight:700;letter-spacing:1px;margin-bottom:2px">ENTRY MODEL - ORB + VWAP + MSB</div><div style="font-size:8px;color:#333;margin-bottom:10px">5-min ORB . VWAP filter . MSB Break-Retest-Reject . 5 contracts max</div>'+workflowHtml+rulesHtml+vwapHtml+stepHtml+dqHtml+'</div>';
 }
 
 // -- SIGNAL TAB ---------------------------------------------------------------
@@ -723,7 +710,7 @@ var mktInputs = {
   gexRegime:"POSITIVE",gexFlip:"29400",callWall:"29750",putWall:"28500",gexMagnitude:"MODERATE",zerodte:"LOW",
   vah:"29500",val:"29050",poc:"29250",vaPosition:"ABOVE",
   cotPosition:"LONG",cotTrend:"DECREASING",
-  mom5d:"UP",mom20d:"UP",mom60d:"UP",
+  mom5d:"UP",mom20d:"UP",mom60d:"UP",ret20d:"4.5",
   vixVix3m:"NORMAL",vvix:"98",
   adRatio:"0.55",pctAbove50ma:"61",hiLoRatio:"0.65",
   fearGreed:"48",aaiiSentiment:"BEARISH",
@@ -769,7 +756,7 @@ function getMorningBriefHTML(){
   html+=buildInputGroup("NEWS & MACRO","#ff3d57","investing.com/economic-calendar",[["dataToday","DATA TODAY","CPI/PPI/JOBS/NONE"],["fedDays","DAYS TO FED","e.g. 21"],["geopolScore","GEOPOL SCORE","0-100 (50=neutral)"],["earningsDays","DAYS TO EARN","e.g. 3"],["opexDays","DAYS TO OPEX","e.g. 7"],["cbSpeech","CB SPEECH","FED/BOJ/ECB/NONE"],["newsAgeHours","NEWS AGE HRS","e.g. 8"]],4);
   html+=buildInputGroup("GAMMA EXPOSURE","#ff6b35","SpotGamma.com / MenthorQ.com / GEXmetrix.com",[["gexRegime","GEX REGIME","POSITIVE or NEGATIVE"],["gexFlip","GEX FLIP LEVEL","e.g. 29400"],["callWall","CALL WALL","e.g. 29500"],["putWall","PUT WALL","e.g. 28500"],["gexMagnitude","GEX MAGNITUDE","STRONG/MODERATE/WEAK"],["zerodte","0DTE LEVEL","EXTREME/HIGH/NORMAL/LOW"]],5);
   html+=buildInputGroup("MARKET PROFILE","#00d4aa","TradingView Volume Profile indicator (free)",[["vah","VALUE AREA HIGH","e.g. 29450"],["val","VALUE AREA LOW","e.g. 28950"],["poc","POINT OF CTRL","e.g. 29200"],["vaPosition","VA POSITION","INSIDE/ABOVE/BELOW"]],6);
-  html+=buildInputGroup("BREADTH + SENTIMENT + COT","#a78bfa","finviz.com | money.cnn.com/fear-greed | aaii.com | barchart.com/cot",[["fearGreed","FEAR & GREED","0-100 (CNN Money)"],["adRatio","ADVANCE/DECLINE","e.g. 0.8"],["pctAbove50ma","% ABOVE 50MA","e.g. 62"],["hiLoRatio","HIGH/LOW RATIO","e.g. 0.7"],["aaiiSentiment","AAII SENTIMENT","BULLISH/BEARISH/NEUTRAL"],["cotPosition","COT POSITION","LONG/SHORT/NEUTRAL"],["cotTrend","COT TREND","INCREASING/DECREASING"],["mom5d","5D MOMENTUM","UP or DOWN"],["mom20d","20D MOMENTUM","UP or DOWN"],["mom60d","60D MOMENTUM","UP or DOWN"],["vixVix3m","VIX TERM STRUCT","NORMAL or INVERTED"],["vvix","VVIX","e.g. 95"],["darkPoolBias","DARK POOL BIAS","BULLISH/BEARISH/NEUTRAL"],["unusualOptions","UNUSUAL OPT","CALLS/PUTS/NONE"]],7);
+  html+=buildInputGroup("BREADTH + SENTIMENT + COT","#a78bfa","finviz.com | money.cnn.com/fear-greed | aaii.com | barchart.com/cot",[["fearGreed","FEAR & GREED","0-100 (CNN Money)"],["adRatio","ADVANCE/DECLINE","e.g. 0.8"],["pctAbove50ma","% ABOVE 50MA","e.g. 62"],["hiLoRatio","HIGH/LOW RATIO","e.g. 0.7"],["aaiiSentiment","AAII SENTIMENT","BULLISH/BEARISH/NEUTRAL"],["cotPosition","COT POSITION","LONG/SHORT/NEUTRAL"],["cotTrend","COT TREND","INCREASING/DECREASING"],["mom5d","5D MOMENTUM","UP or DOWN"],["mom20d","20D MOMENTUM","UP or DOWN"],["ret20d","20D RETURN %","e.g. 1.5"],["mom60d","60D MOMENTUM","UP or DOWN"],["vixVix3m","VIX TERM STRUCT","NORMAL or INVERTED"],["vvix","VVIX","e.g. 95"],["darkPoolBias","DARK POOL BIAS","BULLISH/BEARISH/NEUTRAL"],["unusualOptions","UNUSUAL OPT","CALLS/PUTS/NONE"]],7);
 
   html+="<div style='background:#00d4aa08;border:1px solid #00d4aa33;border-radius:4px;padding:6px 8px;margin-top:6px;margin-bottom:8px'>"
     +"<div style='display:flex;justify-content:space-between;margin-bottom:4px'>"
@@ -805,7 +792,7 @@ function updateSignalMeter(){if(state.tab==="signal")renderContent();}
 
 function renderSignal(){
   var inst=calcInstitutional(),pct2=Math.max(5,Math.min(95,inst.composite));
-  var col=pct2>=62?"#00ff9f":pct2<=38?"#ff3d57":"#fbbf24";
+  var col=pct2>=60?"#00ff9f":pct2<=35?"#ff3d57":"#fbbf24";
   var now=new Date(),h=now.getUTCHours(),dow=now.getUTCDay();
   var isWknd=(dow===5&&h>=21)||dow===6||(dow===0&&h<22);
   var sessHtml="";
@@ -813,8 +800,12 @@ function renderSignal(){
   else{var sessions=[{name:"ASIA OPEN",utcH:19},{name:"LONDON OPEN",utcH:3},{name:"NY OPEN",utcH:13,utcM:30},{name:"NY CLOSE",utcH:20}];var nowMin=h*60+now.getUTCMinutes();var upcoming=sessions.map(function(s){var sm=(s.utcH||0)*60+(s.utcM||0);var d=sm-nowMin;if(d<-120)d+=1440;return{name:s.name,diff:d};}).filter(function(s){return s.diff>=0;}).slice(0,3);sessHtml='<div class="card-sm"><div class="lbl">SESSION CLOCK</div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">';upcoming.forEach(function(u){sessHtml+='<span style="font-size:7px;color:#555">'+u.name+'</span><span style="font-size:9px;color:#fbbf24;font-weight:700">in '+(u.diff<60?u.diff+"m":Math.floor(u.diff/60)+"h "+u.diff%60+"m")+'</span>';});sessHtml+='</div></div>';}
   var oilAlert=getOilAlert(),oilHtml="";
   if(Math.abs(LIVE.OIL.chgPct||0)>=1){oilHtml='<div style="background:'+oilAlert.color+'11;border:1px solid '+oilAlert.color+'44;border-radius:5px;padding:8px 10px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;color:'+oilAlert.color+';font-weight:700">OIL ALERT: '+oilAlert.level+' - $'+LIVE.OIL.price+' ('+pct(LIVE.OIL.chgPct)+')</span><span style="font-size:8px;color:'+oilAlert.color+';border:1px solid '+oilAlert.color+'44;border-radius:2px;padding:0 5px;font-weight:700">'+oilAlert.action+'</span></div></div>';}
+  var regime=getRegime();
+  var regimeHtml='<div style="background:'+regime.color+'11;border:1px solid '+regime.color+'44;border-radius:5px;padding:8px 10px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;color:'+regime.color+';font-weight:700;letter-spacing:1px">REGIME: '+regime.name+'</span><span style="font-size:7px;color:#444">VIX '+LIVE.VIX.price+' . 20D RET '+(parseFloat(mktInputs.ret20d)||0)+'%</span></div>'+(regime.warn?'<div style="margin-top:4px;font-size:9px;color:'+regime.color+';font-weight:700">! LOW VOL CHOP - REDUCE TO 3 CONTRACTS - this regime underperforms in backtest</div>':'')+'</div>';
+  var backtestHtml='<div style="background:#0a0a0a;border:1px solid #00d4aa22;border-radius:5px;padding:6px 10px;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:center"><span style="font-size:7px;color:#00d4aa;font-weight:700;letter-spacing:1px">BACKTEST (342 DAYS)</span><span style="font-size:8px;color:#888">64 trades . 89.1% WR . PF 11.65 . Max DD -$1,297 . Avg $3,124/mo</span></div>';
+  var factorsHtml='<div style="background:#0a0a0a;border:1px solid #a78bfa22;border-radius:5px;padding:8px 10px;margin-bottom:8px"><div style="font-size:7px;color:#a78bfa;font-weight:700;letter-spacing:1px;margin-bottom:4px">VALIDATED FACTORS (342-DAY BACKTEST)</div><div style="font-size:8px;color:#666;line-height:1.6"><span style="color:#00ff9f">CORE (validated edge):</span> VIX regime, Oil direction, Previous Close Position.<br><span style="color:#ff3d57">NOISE (no statistical edge):</span> Gap direction, Week position - shown for context only.</div></div>';
   var inputsHtml=getMorningBriefHTML();
-  var instCtx='<div style="background:#0a0a0a;border:1px solid #a78bfa22;border-radius:6px;padding:10px;margin-bottom:10px"><div style="font-size:8px;color:#a78bfa;font-weight:700;letter-spacing:1px;margin-bottom:8px">INSTITUTIONAL CONTEXT</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">'+[["WEEKLY RANGE",inst.weekPos+"%",inst.weekPos>65?"#ff3d57":inst.weekPos<35?"#00ff9f":"#fbbf24",inst.weekPos>80?"Near weekly HIGH":inst.weekPos<20?"Near weekly LOW":"Mid weekly range"],["GAP",inst.gapDir+" "+(Math.abs(inst.gapPts)||0).toFixed(0)+" pts",inst.gapDir==="GAP UP"?"#00ff9f":inst.gapDir==="GAP DOWN"?"#ff3d57":"#888",inst.gapDir==="GAP UP"?"Gap up - bullish if holds":inst.gapDir==="GAP DOWN"?"Gap down - bearish if holds":"Flat open"],["PREV DAY POS",inst.prevPos+"%",inst.prevPos>65?"#ff3d57":inst.prevPos<35?"#00ff9f":"#fbbf24",inst.prevPos>80?"Above PDH":inst.prevPos<20?"Below PDL":"Inside prev day range"],["STRUCTURE",inst.trend,inst.trend==="BULL"?"#00ff9f":"#ff3d57",inst.trend==="BULL"?"Buyers in control":"Sellers in control"]].map(function(item){return '<div style="background:#070707;border:1px solid #111;border-radius:4px;padding:6px 8px"><div style="font-size:7px;color:#333;margin-bottom:2px">'+item[0]+'</div><div style="font-size:11px;color:'+item[2]+';font-weight:700;margin-bottom:2px">'+item[1]+'</div><div style="font-size:7.5px;color:#444;line-height:1.3">'+item[3]+'</div></div>';}).join("")+'</div><div style="margin-bottom:6px"><div style="font-size:7px;color:#a78bfa;margin-bottom:4px;letter-spacing:1px">ORDER BLOCKS</div>'+SIGNAL.institutional.orderBlocks.map(function(ob){var c=ob.type.indexOf("BEAR")>=0?"#ff3d57":"#00ff9f";return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111"><div><span style="font-size:9px;color:'+c+';font-weight:700">'+ob.level.toLocaleString()+'</span><span style="font-size:7px;color:'+c+'88;margin-left:5px">'+ob.type+'</span></div><span style="font-size:7.5px;color:#444;max-width:55%;text-align:right;line-height:1.3">'+ob.note+'</span></div>';}).join("")+'</div><div><div style="font-size:7px;color:#fbbf24;margin-bottom:4px;letter-spacing:1px">LIQUIDITY POOLS</div>'+SIGNAL.institutional.liquidityLevels.map(function(ll){var c=ll.type.indexOf("BUY")>=0?"#00ff9f":"#ff3d57";return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111"><div><span style="font-size:9px;color:'+c+';font-weight:700">'+ll.level.toLocaleString()+'</span><span style="font-size:7px;color:'+c+'88;margin-left:5px">'+ll.type+'</span></div><span style="font-size:7.5px;color:#444;max-width:55%;text-align:right;line-height:1.3">'+ll.note+'</span></div>';}).join("")+'</div></div>';
+  var instCtx='<div style="background:#0a0a0a;border:1px solid #a78bfa22;border-radius:6px;padding:10px;margin-bottom:10px"><div style="font-size:8px;color:#a78bfa;font-weight:700;letter-spacing:1px;margin-bottom:8px">INSTITUTIONAL CONTEXT</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px">'+[["WEEKLY RANGE",inst.weekPos+"%",inst.weekPos>65?"#ff3d57":inst.weekPos<35?"#00ff9f":"#fbbf24",inst.weekPos>80?"Near weekly HIGH":inst.weekPos<20?"Near weekly LOW":"Mid weekly range","NOISE"],["GAP",inst.gapDir+" "+(Math.abs(inst.gapPts)||0).toFixed(0)+" pts",inst.gapDir==="GAP UP"?"#00ff9f":inst.gapDir==="GAP DOWN"?"#ff3d57":"#888",inst.gapDir==="GAP UP"?"Gap up - bullish if holds":inst.gapDir==="GAP DOWN"?"Gap down - bearish if holds":"Flat open","NOISE"],["PREV DAY POS",inst.prevPos+"%",inst.prevPos>65?"#ff3d57":inst.prevPos<35?"#00ff9f":"#fbbf24",inst.prevPos>80?"Above PDH":inst.prevPos<20?"Below PDL":"Inside prev day range","VALIDATED"],["STRUCTURE",inst.trend,inst.trend==="BULL"?"#00ff9f":"#ff3d57",inst.trend==="BULL"?"Buyers in control":"Sellers in control",null]].map(function(item){var tag=item[4]?"<span style='font-size:6px;color:"+(item[4]==="VALIDATED"?"#00ff9f":"#ff3d57")+";border:1px solid "+(item[4]==="VALIDATED"?"#00ff9f44":"#ff3d5744")+";border-radius:2px;padding:0 3px;margin-left:4px'>"+item[4]+"</span>":"";return '<div style="background:#070707;border:1px solid #111;border-radius:4px;padding:6px 8px"><div style="font-size:7px;color:#333;margin-bottom:2px">'+item[0]+tag+'</div><div style="font-size:11px;color:'+item[2]+';font-weight:700;margin-bottom:2px">'+item[1]+'</div><div style="font-size:7.5px;color:#444;line-height:1.3">'+item[3]+'</div></div>';}).join("")+'</div><div style="margin-bottom:6px"><div style="font-size:7px;color:#a78bfa;margin-bottom:4px;letter-spacing:1px">ORDER BLOCKS</div>'+SIGNAL.institutional.orderBlocks.map(function(ob){var c=ob.type.indexOf("BEAR")>=0?"#ff3d57":"#00ff9f";return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111"><div><span style="font-size:9px;color:'+c+';font-weight:700">'+ob.level.toLocaleString()+'</span><span style="font-size:7px;color:'+c+'88;margin-left:5px">'+ob.type+'</span></div><span style="font-size:7.5px;color:#444;max-width:55%;text-align:right;line-height:1.3">'+ob.note+'</span></div>';}).join("")+'</div><div><div style="font-size:7px;color:#fbbf24;margin-bottom:4px;letter-spacing:1px">LIQUIDITY POOLS</div>'+SIGNAL.institutional.liquidityLevels.map(function(ll){var c=ll.type.indexOf("BUY")>=0?"#00ff9f":"#ff3d57";return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #111"><div><span style="font-size:9px;color:'+c+';font-weight:700">'+ll.level.toLocaleString()+'</span><span style="font-size:7px;color:'+c+'88;margin-left:5px">'+ll.type+'</span></div><span style="font-size:7.5px;color:#444;max-width:55%;text-align:right;line-height:1.3">'+ll.note+'</span></div>';}).join("")+'</div></div>';
   var killHtml='<div style="background:#0a0a0a;border:1px solid #fbbf2422;border-radius:6px;padding:10px;margin-bottom:10px"><div style="font-size:8px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:6px">KILL ZONES</div>'+SIGNAL.institutional.killZones.map(function(kz){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #111"><div><div style="font-size:9px;color:'+(kz.active?"#fbbf24":"#333")+';font-weight:700">'+kz.name+'</div><div style="font-size:7.5px;color:#444">'+kz.time+'</div></div><div style="text-align:right;max-width:55%"><div style="font-size:7.5px;color:#555;line-height:1.3">'+kz.note+'</div></div></div>';}).join("")+'</div>';
 
   var R=80,CX=106,CY=102,ang=Math.PI*(1-pct2/100);
@@ -824,9 +815,9 @@ function renderSignal(){
   var scoreHtml=scoreKeys.map(function(item){var v=inst.scores[item[0]]||50;var sc=v>=60?"#00ff9f":v<=40?"#ff3d57":"#fbbf24";var reasoning={priceStructure:"Wk pos "+inst.weekPos+"%. "+inst.gapDir+". Prev pos "+inst.prevPos+"%.",orderFlow:"VIX "+pct(LIVE.VIX.chgPct||0)+". Oil "+pct(LIVE.OIL.chgPct||0)+". MAG7 "+["AAPL","MSFT","NVDA","AMZN","GOOGL","META","TSLA"].filter(function(s){return (LIVE[s]&&LIVE[s].chgPct||0)>0;}).length+"/7 green.",instLevels:"VWAP dist "+(LIVE.MNQ.price-SIGNAL.scalperLevels.vwap).toFixed(0)+" pts. "+SIGNAL.institutional.bias,newsMacro:SIGNAL.reasoning.newsAndMacro}[item[0]]||"";return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:7.5px;color:#2a2a2a">'+item[1]+' '+item[2]+'</span><span style="font-size:9px;color:'+sc+';font-weight:700">'+v+'</span></div><div class="bar-wrap"><div class="bar-fill" style="width:'+v+'%;background-position:'+(100-v)+'%"></div></div>'+(reasoning?'<div style="font-size:7.5px;color:#444;line-height:1.3;margin-top:1px">'+reasoning+'</div>':"")+'</div>';}).join("");
   var gaugeHtml='<div class="card"><div style="font-size:7.5px;color:#2a2a2a;letter-spacing:2px;margin-bottom:4px">INSTITUTIONAL SIGNAL</div><div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start"><div style="min-width:212px;flex:0 0 212px"><svg viewBox="0 0 212 120" style="width:100%;display:block"><path d="M '+(CX-R)+' '+CY+' A '+R+' '+R+' 0 0 1 '+(CX+R)+' '+CY+'" fill="none" stroke="#1a1a1a" stroke-width="12" stroke-linecap="round"/><path d="M '+(CX-R)+' '+CY+' A '+R+' '+R+' 0 0 1 '+fX+' '+fY+'" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" style="filter:drop-shadow(0 0 5px '+col+'88)"/><line x1="'+CX+'" y1="'+(CY+1)+'" x2="'+nX+'" y2="'+(+nY+1)+'" stroke="#00000077" stroke-width="3" stroke-linecap="round"/><line x1="'+CX+'" y1="'+CY+'" x2="'+nX+'" y2="'+nY+'" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="'+CX+'" cy="'+CY+'" r="5" fill="#111" stroke="#444" stroke-width="1.5"/><circle cx="'+CX+'" cy="'+CY+'" r="2.5" fill="'+col+'"/><text x="'+(CX-R)+'" y="'+(CY+15)+'" fill="#ff3d57aa" font-size="9" font-family="monospace" text-anchor="middle">SHORT</text><text x="'+(CX+R)+'" y="'+(CY+15)+'" fill="#00ff9faa" font-size="9" font-family="monospace" text-anchor="middle">LONG</text><text x="'+CX+'" y="'+(CY-19)+'" fill="'+col+'" font-size="21" font-family="monospace" font-weight="bold" text-anchor="middle">'+pct2+'%</text><text x="'+CX+'" y="'+(CY-5)+'" fill="'+col+'" font-size="7.5" font-family="monospace" text-anchor="middle">'+inst.conviction+'</text></svg><div style="display:flex;height:4px;border-radius:2px;overflow:hidden;margin-top:2px"><div style="width:'+(100-pct2)+'%;background:#ff3d57"></div><div style="width:'+pct2+'%;background:#00ff9f"></div></div><div style="display:flex;justify-content:space-between;margin-top:2px"><span style="font-size:7px;color:#ff3d57">SHORT '+(100-pct2)+'%</span><span style="font-size:7px;color:#00ff9f">LONG '+pct2+'%</span></div><div style="margin-top:8px;background:#0a0a0a;border:1px solid #111;border-radius:4px;padding:7px 9px"><div style="font-size:7px;color:#fbbf24;margin-bottom:5px;letter-spacing:1px">! SCALPER LEVELS</div>'+[["R3",SIGNAL.scalperLevels.r3,"#ff3d5766"],["R2",SIGNAL.scalperLevels.r2,"#ff3d5799"],["R1",SIGNAL.scalperLevels.r1,"#ff4444bb"],["VWAP",SIGNAL.scalperLevels.vwap,"#fbbf24"],["S1",SIGNAL.scalperLevels.s1,"#00ff9fbb"],["S2",SIGNAL.scalperLevels.s2,"#00ff9f99"],["S3",SIGNAL.scalperLevels.s3,"#00ff9f66"]].map(function(item){return '<div class="level-row"><span style="font-size:8px;color:'+item[2]+';font-weight:700">'+item[0]+'</span><span style="font-size:9px;color:'+item[2]+';font-weight:700">'+item[1].toLocaleString()+'</span></div>';}).join("")+'</div></div><div style="flex:1;min-width:130px">'+scoreHtml+'</div></div><div style="margin-top:8px;background:'+col+'0d;border:1px solid '+col+'22;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:'+col+';margin-bottom:2px">DOMINANT THESIS</div><div style="font-size:10px;color:#888;line-height:1.5">'+SIGNAL.thesis+'</div></div><div style="margin-top:5px;background:#fbbf2408;border:1px solid #fbbf2422;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:#fbbf24;margin-bottom:2px">! SCALP ENTRY NOTES</div><div style="font-size:10px;color:#777;line-height:1.5">'+SIGNAL.entryNotes+'</div></div><div style="margin-top:5px;background:#ff3d5708;border:1px solid #ff3d5722;border-radius:5px;padding:7px 9px"><div style="font-size:7px;color:#ff3d57;margin-bottom:2px">[!] TOP RISK</div><div style="font-size:10px;color:#555;line-height:1.5">'+SIGNAL.mainRisk+'</div></div></div>';
 
-  var recScore=inst.composite,recBg=recScore>=65?"#00ff9f":recScore<=35?"#ff3d57":"#fbbf24";
-  var recAction=recScore>=75?"STRONG "+(recScore>=65?"LONG":"WAIT")+" - HIGH CONVICTION":recScore>=65?"LEAN LONG - CONFIRMED BIAS":recScore<=25?"STRONG SHORT - HIGH CONVICTION":recScore<=35?"LEAN SHORT - CONFIRMED BIAS":recScore>=55?"MILD LONG BIAS - A+ SETUPS ONLY":recScore<=45?"MILD SHORT BIAS - A+ SETUPS ONLY":"NEUTRAL - NO TRADE ZONE";
-  var tradeInstruction=recScore>=65&&inst.activeKZ?"Kill zone ACTIVE. Watch for ORB HIGH break + VWAP above + MSB retest -> LONG 5 contracts":recScore<=35&&inst.activeKZ?"Kill zone ACTIVE. Watch for ORB LOW break + VWAP below + MSB retest -> SHORT 5 contracts":recScore>=65?"Wait for kill zone + 9:35 ORB. Long bias confirmed. Only trade ORB high breakout with VWAP above + MSB.":recScore<=35?"Wait for kill zone + 9:35 ORB. Short bias confirmed. Only trade ORB low breakdown with VWAP below + MSB.":"Score "+recScore+" is in NO-TRADE ZONE (35-65). Sit on hands. Wait for score to clear 65 or drop below 35.";
+  var recScore=inst.composite,recBg=recScore>=60?"#00ff9f":recScore<=35?"#ff3d57":"#fbbf24";
+  var recAction=recScore>=75?"STRONG "+(recScore>=60?"LONG":"WAIT")+" - HIGH CONVICTION":recScore>=60?"LEAN LONG - CONFIRMED BIAS":recScore<=25?"STRONG SHORT - HIGH CONVICTION":recScore<=35?"LEAN SHORT - CONFIRMED BIAS":recScore>=50?"MILD LONG BIAS - A+ SETUPS ONLY":recScore<=45?"MILD SHORT BIAS - A+ SETUPS ONLY":"NEUTRAL - NO TRADE ZONE";
+  var tradeInstruction=recScore>=60&&inst.activeKZ?"Kill zone ACTIVE. Watch for ORB HIGH break + VWAP above + MSB retest -> LONG 5 contracts":recScore<=35&&inst.activeKZ?"Kill zone ACTIVE. Watch for ORB LOW break + VWAP below + MSB retest -> SHORT 5 contracts":recScore>=60?"Wait for kill zone + 9:35 ORB. Long bias confirmed. Only trade ORB high breakout with VWAP above + MSB.":recScore<=35?"Wait for kill zone + 9:35 ORB. Short bias confirmed. Only trade ORB low breakdown with VWAP below + MSB.":"Score "+recScore+" is in NO-TRADE ZONE (35-60). Sit on hands. Wait for score to clear 60 or drop below 35.";
   var recHtml="<div style='background:"+recBg+"18;border:2px solid "+recBg+"66;border-radius:8px;padding:12px 14px;margin-bottom:10px'>"
     +"<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:8px'>"
     +"<div><div style='font-size:7px;color:"+recBg+";letter-spacing:2px;font-weight:700;margin-bottom:2px'>INSTITUTIONAL SIGNAL</div>"
@@ -835,8 +826,8 @@ function renderSignal(){
     +"<div style='font-size:28px;color:"+recBg+";font-weight:700;line-height:1'>"+recScore+"</div>"
     +"<div style='font-size:7px;color:"+recBg+"99;margin-top:2px'>/100</div></div></div>"
     +"<div style='margin-bottom:8px'>"
-    +"<div style='display:flex;justify-content:space-between;margin-bottom:2px'><span style='font-size:7px;color:#ff3d57'>SHORT &lt;35</span><span style='font-size:7px;color:#fbbf24'>NO TRADE 35-65</span><span style='font-size:7px;color:#00ff9f'>LONG &gt;65</span></div>"
-    +"<div style='height:8px;background:#0d0d0d;border-radius:4px;overflow:hidden;position:relative;display:flex'><div style='width:35%;background:#ff3d5733;border-right:1px solid #ff3d5566'></div><div style='width:30%;background:#fbbf2422'></div><div style='width:35%;background:#00ff9f22;border-left:1px solid #00ff9f44'></div></div>"
+    +"<div style='display:flex;justify-content:space-between;margin-bottom:2px'><span style='font-size:7px;color:#ff3d57'>SHORT &lt;35</span><span style='font-size:7px;color:#fbbf24'>NO TRADE 35-60</span><span style='font-size:7px;color:#00ff9f'>LONG &gt;60</span></div>"
+    +"<div style='height:8px;background:#0d0d0d;border-radius:4px;overflow:hidden;position:relative;display:flex'><div style='width:35%;background:#ff3d5733;border-right:1px solid #ff3d5566'></div><div style='width:25%;background:#fbbf2422'></div><div style='width:40%;background:#00ff9f22;border-left:1px solid #00ff9f44'></div></div>"
     +"<div style='position:relative;height:6px;margin-top:1px'><div style='position:absolute;left:calc("+recScore+"% - 3px);top:0;width:6px;height:6px;background:"+recBg+";border-radius:50%;border:1px solid #000'></div></div>"
     +"<div style='display:flex;justify-content:space-between;margin-top:1px'><span style='font-size:6px;color:#333'>0</span><span style='font-size:6px;color:#333'>25</span><span style='font-size:6px;color:#333'>50</span><span style='font-size:6px;color:#333'>75</span><span style='font-size:6px;color:#333'>100</span></div></div>"
     +"<div style='background:"+recBg+"11;border:1px solid "+recBg+"33;border-radius:5px;padding:8px 10px;margin-bottom:6px'>"
@@ -846,7 +837,7 @@ function renderSignal(){
     +(inst.activeKZ?"<div style='background:#00ff9f22;border:1px solid #00ff9f44;border-radius:3px;padding:2px 8px'><span style='font-size:8px;color:#00ff9f;font-weight:700'>* "+inst.activeKZ.name+" ACTIVE</span></div>":"<div style='background:#11111122;border:1px solid #222;border-radius:3px;padding:2px 8px'><span style='font-size:8px;color:#333'>No kill zone active</span></div>")
     +"<div style='font-size:7px;color:#444'>"+(mktInputs.todayOpen?"<span style='color:#00ff9f'>v Today open: "+mktInputs.todayOpen+"</span>":"<span style='color:#fbbf24'>! Enter today open at 9:30 AM ET</span>")+"</div></div></div>";
 
-  return sessHtml+oilHtml+recHtml+inputsHtml+gaugeHtml+instCtx+killHtml;
+  return sessHtml+oilHtml+regimeHtml+backtestHtml+factorsHtml+recHtml+inputsHtml+gaugeHtml+instCtx+killHtml;
 }
 
 // -- PRETRADE -----------------------------------------------------------------
@@ -864,9 +855,9 @@ var PRETRADE=[
 // -- LIVE TAB -----------------------------------------------------------------
 function renderLive(){
   var inst=calcInstitutional(),score=inst.composite;
-  var scoreCol=score>=65?"#00ff9f":score<=35?"#ff3d57":"#fbbf24";
-  var scoreLabel=score>=75?"STRONG LONG":score>=65?"LEAN LONG":score>=55?"MILD LONG":score<=25?"STRONG SHORT":score<=35?"LEAN SHORT":score<=45?"MILD SHORT":"NEUTRAL";
-  var tradeAction=score>=65?"LOOK FOR LONGS":score<=35?"LOOK FOR SHORTS":"SIT ON HANDS";
+  var scoreCol=score>=60?"#00ff9f":score<=35?"#ff3d57":"#fbbf24";
+  var scoreLabel=score>=75?"STRONG LONG":score>=60?"LEAN LONG":score>=50?"MILD LONG":score<=25?"STRONG SHORT":score<=35?"LEAN SHORT":score<=45?"MILD SHORT":"NEUTRAL";
+  var tradeAction=score>=60?"LOOK FOR LONGS":score<=35?"LOOK FOR SHORTS":"SIT ON HANDS";
   var now=new Date(),utcH=now.getUTCHours(),utcM=now.getUTCMinutes();
   var jstH=(utcH+9)%24,jstStr=(jstH<10?"0":"")+jstH+":"+(utcM<10?"0":"")+utcM;
   var nyH=(utcH-4+24)%24,nyStr=(nyH<10?"0":"")+nyH+":"+(utcM<10?"0":"")+utcM;
@@ -885,8 +876,8 @@ function renderLive(){
   +"<div style='background:"+scoreCol+"18;border:2px solid "+scoreCol+"66;border-radius:8px;padding:12px;margin-bottom:8px'>"
   +"<div style='display:flex;justify-content:space-between;align-items:center'><div><div style='font-size:8px;color:"+scoreCol+";letter-spacing:2px;font-weight:700'>SIGNAL</div><div style='font-size:20px;color:"+scoreCol+";font-weight:700;line-height:1.1'>"+scoreLabel+"</div><div style='font-size:10px;color:#aaa;margin-top:3px'>"+tradeAction+"</div></div>"
   +"<div style='text-align:center;background:"+scoreCol+"22;border:1px solid "+scoreCol+"44;border-radius:6px;padding:6px 14px'><div style='font-size:26px;color:"+scoreCol+";font-weight:700;line-height:1'>"+score+"</div><div style='font-size:7px;color:"+scoreCol+"99'>/100</div></div></div>"
-  +"<div style='margin-top:8px;height:6px;background:#0d0d0d;border-radius:3px;overflow:hidden;position:relative'><div style='position:absolute;left:0;top:0;width:35%;height:100%;background:#ff3d5522'></div><div style='position:absolute;left:35%;top:0;width:30%;height:100%;background:#fbbf2422'></div><div style='position:absolute;left:65%;top:0;width:35%;height:100%;background:#00ff9f22'></div><div style='position:absolute;top:0;left:calc("+score+"% - 3px);width:6px;height:100%;background:"+scoreCol+";border-radius:3px'></div></div>"
-  +"<div style='display:flex;justify-content:space-between;margin-top:2px'><span style='font-size:6px;color:#ff3d57'>SHORT &lt;35</span><span style='font-size:6px;color:#fbbf24'>NEUTRAL</span><span style='font-size:6px;color:#00ff9f'>LONG &gt;65</span></div></div>"
+  +"<div style='margin-top:8px;height:6px;background:#0d0d0d;border-radius:3px;overflow:hidden;position:relative'><div style='position:absolute;left:0;top:0;width:35%;height:100%;background:#ff3d5522'></div><div style='position:absolute;left:35%;top:0;width:25%;height:100%;background:#fbbf2422'></div><div style='position:absolute;left:60%;top:0;width:40%;height:100%;background:#00ff9f22'></div><div style='position:absolute;top:0;left:calc("+score+"% - 3px);width:6px;height:100%;background:"+scoreCol+";border-radius:3px'></div></div>"
+  +"<div style='display:flex;justify-content:space-between;margin-top:2px'><span style='font-size:6px;color:#ff3d57'>SHORT &lt;35</span><span style='font-size:6px;color:#fbbf24'>NEUTRAL</span><span style='font-size:6px;color:#00ff9f'>LONG &gt;60</span></div></div>"
   +"<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px;margin-bottom:8px'>"
   +"<div style='font-size:7px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:6px'>KEY LEVELS</div>"
   +"<div style='display:grid;grid-template-columns:1fr 1fr;gap:4px'>"+[["RESISTANCE",SIGNAL.keyLevels.resistance,"#ff3d57"],["SUPPORT",SIGNAL.keyLevels.support,"#00ff9f"],["VWAP EST",SIGNAL.scalperLevels.vwap,"#fbbf24"],["PIVOT",SIGNAL.keyLevels.pivot,"#a78bfa"]].map(function(l){return "<div style='background:#070707;border:1px solid #111;border-radius:4px;padding:5px 7px'><div style='font-size:6.5px;color:#333;margin-bottom:2px'>"+l[0]+"</div><div style='font-size:10px;color:"+l[2]+";font-weight:700'>"+l[1]+"</div></div>";}).join("")+"</div>"
@@ -898,7 +889,7 @@ function renderLive(){
   +"</div>"
   +"<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px;margin-bottom:8px'><div style='font-size:7px;color:#a78bfa;font-weight:700;letter-spacing:1px;margin-bottom:6px'>PRE-TRADE QUICK CHECK</div><div style='display:grid;grid-template-columns:1fr 1fr;gap:3px'>"+[["Signal checked",score!==50],["VIX below 25",vix<25],["Oil alert clear",!oilAlert],["In kill zone",isInSession],["Max 5 contracts",true],["Under $400 loss",true]].map(function(item){return "<div style='display:flex;gap:5px;align-items:center;padding:3px 5px;background:#070707;border-radius:3px'><span style='font-size:9px;color:"+(item[1]?"#00ff9f":"#ff3d57")+";font-weight:700'>"+(item[1]?"v":"x")+"</span><span style='font-size:7.5px;color:#555'>"+item[0]+"</span></div>";}).join("")+"</div></div>"
   +"<div style='background:"+scoreCol+"08;border:1px solid "+scoreCol+"22;border-radius:5px;padding:8px;margin-bottom:8px'><div style='font-size:7px;color:"+scoreCol+";font-weight:700;letter-spacing:1px;margin-bottom:4px'>TODAY&apos;S THESIS</div><div style='font-size:9px;color:#666;line-height:1.6'>"+SIGNAL.thesis+"</div></div>"
-  +"<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px'><div style='font-size:7px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:5px'>ENTRY CHECKLIST - JST TIMES</div>"+["1. 10:25 PM JST - Send 15-min chart screenshot to Claude","2. Watch 5-min candle form - note energy and VWAP position","3. 10:35 PM JST - Send ORB High and Low to Claude","4. Entry card returned within 60 seconds","5. Check VWAP - trade direction must match VWAP side","6. Wait for MSB + Break-Retest-Reject at ORB level","7. Enter on rejection - 5 contracts - stop at ORB boundary","8. T1 hit - close 3 contracts, move stop to breakeven","9. T2 hit - close remaining 2 - done for the day"].map(function(s){return "<div style='font-size:8px;color:#444;padding:3px 0;border-bottom:1px solid #0a0a0a'>"+s+"</div>";}).join("")+"</div></div>";
+  +"<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px'><div style='font-size:7px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:5px'>ENTRY CHECKLIST - JST TIMES</div>"+["1. 10:25 PM JST - Send 15-min chart screenshot to Claude","2. Watch 5-min candle form - note energy and VWAP position","3. 10:35 PM JST - Send ORB High and Low to Claude","4. Entry card returned within 60 seconds","5. Check VWAP - trade direction must match VWAP side","6. Wait for MSB + Break-Retest-Reject at ORB level","7. Enter on MSB candle close - 5 contracts (3 if deep retest) - stop beyond retest, NOT ORB boundary","8. T1 hit (Open +/- ORB range) - close 3 contracts, move stop to breakeven","9. Trail remaining 2 contracts 50pts behind day's High/Low until stopped out"].map(function(s){return "<div style='font-size:8px;color:#444;padding:3px 0;border-bottom:1px solid #0a0a0a'>"+s+"</div>";}).join("")+"</div></div>";
 }
 
 // -- SCALP TAB ----------------------------------------------------------------
@@ -925,9 +916,9 @@ function renderORB(){
     +"<div><div style='font-size:8px;color:#ff3d57;margin-bottom:4px'>ORB LOW</div><input class='orb-input lo' value='"+(state.orbLow||"")+"' placeholder='e.g. 29270' oninput='state.orbLow=this.value;renderContent()'/></div></div>";
   if(orbR>0){
     html+="<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:8px;margin-bottom:8px'>"
-      +"<div style='font-size:7px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:6px'>ORB RANGE: "+orbR.toFixed(2)+" pts "+(orbR<30?"- TOO TIGHT - SKIP":orbR<60?"- NARROW - REDUCE SIZE":orbR<120?"- GOOD RANGE":"- WIDE - REDUCE SIZE")+"</div>"
+      +"<div style='font-size:7px;color:#fbbf24;font-weight:700;letter-spacing:1px;margin-bottom:6px'>ORB RANGE: "+orbR.toFixed(2)+" pts "+(orbR<50?"- SKIP - TOO TIGHT":orbR<100?"- NORMAL - FULL 5 CONTRACTS":orbR<150?"- WIDE - REDUCE TO 3 CONTRACTS":"- EXTREME - SKIP SESSION")+"</div>"
       +[["R3",t3H,"#ff3d5766"],["R2",t2H,"#ff3d5799"],["R1",t1H,"#ff4444bb"],["ORB HIGH",orbH,"#00ff9f"],["ORB LOW",orbL,"#ff3d57"],["T1 SHORT",t1L,"#00ff9fbb"],["T2 SHORT",t2L,"#00ff9f99"],["T3 SHORT",t3L,"#00ff9f66"]].map(function(row){return "<div class='target-row'><span style='font-size:8px;color:"+row[2]+";font-weight:700'>"+row[0]+"</span><span style='font-size:10px;color:"+row[2]+";font-weight:700'>"+row[1].toFixed(2)+"</span></div>";}).join("")+"</div>";
-    html+="<div style='background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:5px;padding:8px;margin-bottom:8px'><div style='font-size:7px;color:#00ff9f;font-weight:700;letter-spacing:1px;margin-bottom:5px'>ENTRY RULES - MSB + BREAK-RETEST-REJECT</div><div style='font-size:8px;color:#555;line-height:1.8'>LONG: Body close ABOVE "+orbH.toFixed(2)+" + VWAP above + MSB + Retest-Reject<br>SHORT: Body close BELOW "+orbL.toFixed(2)+" + VWAP below + MSB + Retest-Reject<br>STOP: Long = below "+orbL.toFixed(2)+" | Short = above "+orbH.toFixed(2)+"<br>SIZE: 5 contracts max | T1 close 3 + stop to BE | T2 close 2</div></div>";
+    html+="<div style='background:#00ff9f0a;border:1px solid #00ff9f22;border-radius:5px;padding:8px;margin-bottom:8px'><div style='font-size:7px;color:#00ff9f;font-weight:700;letter-spacing:1px;margin-bottom:5px'>ENTRY RULES - MSB CANDLE CLOSE AT RETEST</div><div style='font-size:8px;color:#555;line-height:1.8'>LONG: Body close ABOVE "+orbH.toFixed(2)+" + VWAP above + MSB candle close at retest<br>SHORT: Body close BELOW "+orbL.toFixed(2)+" + VWAP below + MSB candle close at retest<br>STOP: Below retest low (longs) / Above retest high (shorts) - NOT at ORB low ("+orbL.toFixed(2)+") / high ("+orbH.toFixed(2)+")<br>SIZE: 5 max (3 if deep retest or ORB 100-150pts) | T1 = Open +/- ORB range, close 3 + stop to BE | trail last 2 by 50pts</div></div>";
   } else {
     html+="<div style='background:#0a0a0a;border:1px solid #111;border-radius:5px;padding:20px;text-align:center;color:#333;font-size:9px'>Enter ORB High and Low after 9:35 AM ET (10:35 PM JST)</div>";
   }
@@ -954,12 +945,28 @@ function renderJournal(){
     html+="<div style='background:#0a0a0a;border:1px solid #00ff9f33;border-radius:5px;padding:10px;margin-bottom:8px'>"
       +"<div style='font-size:8px;color:#00ff9f;margin-bottom:6px'>NEW TRADE</div>"
       +"<div class='grid2' style='margin-bottom:6px'>"
-      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SIDE</div><select onchange='state.tradeForm.side=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='LONG' "+(state.tradeForm.side==="LONG"?"selected":"")+">LONG</option><option value='SHORT' "+(state.tradeForm.side==="SHORT"?"selected":"")+">SHORT</option></select></div>"
-      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SIZE</div><input value='"+(state.tradeForm.size||"1")+"' placeholder='contracts' oninput='state.tradeForm.size=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>ACTION</div><select onchange='state.tradeForm.action=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='TRADED' "+(state.tradeForm.action==="TRADED"?"selected":"")+">TRADED</option><option value='SKIPPED' "+(state.tradeForm.action==="SKIPPED"?"selected":"")+">SKIPPED</option></select></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SETUP GRADE</div><select onchange='state.tradeForm.setup_grade=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='Aplus' "+(state.tradeForm.setup_grade==="Aplus"?"selected":"")+">A+ (MA ALIGNED)</option><option value='B' "+(state.tradeForm.setup_grade==="B"?"selected":"")+">B (NOT ALIGNED)</option><option value='SKIP' "+(state.tradeForm.setup_grade==="SKIP"?"selected":"")+">SKIP</option></select></div>"
+      +"</div>"
+      +"<div class='grid3' style='margin-bottom:6px'>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>REGIME</div><select onchange='state.tradeForm.regime=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='CALM' "+(state.tradeForm.regime==="CALM"?"selected":"")+">CALM (VIX&lt;15)</option><option value='CHOP' "+(state.tradeForm.regime==="CHOP"?"selected":"")+">CHOP (LOW VOL)</option><option value='ELEVATED' "+(state.tradeForm.regime==="ELEVATED"?"selected":"")+">ELEVATED (VIX&gt;20)</option></select></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SIDE</div><select onchange='state.tradeForm.side=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='LONG' "+(state.tradeForm.side==="LONG"?"selected":"")+">LONG</option><option value='SHORT' "+(state.tradeForm.side==="SHORT"?"selected":"")+">SHORT</option><option value='NA' "+(state.tradeForm.side==="NA"?"selected":"")+">N/A (SKIP)</option></select></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>CONTRACTS</div><input value='"+(state.tradeForm.size||"1")+"' placeholder='#' oninput='state.tradeForm.size=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"</div>"
       +"<div class='grid2' style='margin-bottom:6px'>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SIGNAL SCORE (PRE)</div><input type='number' value='"+(state.tradeForm.signal_score_pre||"")+"' placeholder='0-100' oninput='state.tradeForm.signal_score_pre=this.value' style='width:100%;background:#111;border:1px solid #222;color:#a78bfa;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>RULES FOLLOWED?</div><select onchange='state.tradeForm.rules_followed=this.value' style='width:100%;background:#111;border:1px solid #222;color:#e0e0e0;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'><option value='YES' "+(state.tradeForm.rules_followed==="YES"?"selected":"")+">YES</option><option value='NO' "+(state.tradeForm.rules_followed==="NO"?"selected":"")+">NO — RULE BREAK</option></select></div>"
+      +"</div>"
+      +"<div class='grid3' style='margin-bottom:6px'>"
       +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>ENTRY</div><input value='"+(state.tradeForm.entry||"")+"' placeholder='price' oninput='state.tradeForm.entry=this.value' style='width:100%;background:#111;border:1px solid #222;color:#00ff9f;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
-      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>EXIT</div><input value='"+(state.tradeForm.exit||"")+"' placeholder='price' oninput='state.tradeForm.exit=this.value' style='width:100%;background:#111;border:1px solid #222;color:#ff3d57;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div></div>"
-      +"<div style='margin-bottom:6px'><div style='font-size:7px;color:#555;margin-bottom:2px'>NOTES</div><input value='"+(state.tradeForm.notes||"")+"' placeholder='setup, what worked, what didnt' oninput='state.tradeForm.notes=this.value' style='width:100%;background:#111;border:1px solid #222;color:#aaa;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>STOP</div><input value='"+(state.tradeForm.stop||"")+"' placeholder='price' oninput='state.tradeForm.stop=this.value' style='width:100%;background:#111;border:1px solid #222;color:#fbbf24;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>T1 TARGET</div><input value='"+(state.tradeForm.t1||"")+"' placeholder='price' oninput='state.tradeForm.t1=this.value' style='width:100%;background:#111;border:1px solid #222;color:#00d4aa;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"</div>"
+      +"<div class='grid2' style='margin-bottom:6px'>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>EXIT</div><input value='"+(state.tradeForm.exit||"")+"' placeholder='price' oninput='state.tradeForm.exit=this.value' style='width:100%;background:#111;border:1px solid #222;color:#ff3d57;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"<div><div style='font-size:7px;color:#555;margin-bottom:2px'>SKIP REASON (if skipped)</div><input value='"+(state.tradeForm.skip_reason||"")+"' placeholder='e.g. VIX too high' oninput='state.tradeForm.skip_reason=this.value' style='width:100%;background:#111;border:1px solid #222;color:#aaa;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
+      +"</div>"
+      +"<div style='margin-bottom:6px'><div style='font-size:7px;color:#555;margin-bottom:2px'>NOTES / RULE BREAK REASON</div><input value='"+(state.tradeForm.notes||"")+"' placeholder='what worked, what broke, why rule was broken' oninput='state.tradeForm.notes=this.value' style='width:100%;background:#111;border:1px solid #222;color:#aaa;padding:5px;border-radius:3px;font-family:monospace;font-size:9px'/></div>"
       +"<div style='display:flex;gap:6px'><button onclick='saveTrade()' style='flex:1;background:#00ff9f22;border:1px solid #00ff9f44;color:#00ff9f;padding:7px;border-radius:3px;cursor:pointer;font-size:9px;font-family:monospace'>SAVE</button>"
       +"<button onclick='state.addingTrade=false;renderContent()' style='flex:1;background:#111;border:1px solid #222;color:#555;padding:7px;border-radius:3px;cursor:pointer;font-size:9px;font-family:monospace'>CANCEL</button></div></div>";
   }
@@ -984,12 +991,31 @@ function renderJournal(){
 
 function saveTrade(){
   var f=state.tradeForm,entry=parseFloat(f.entry||0),exit=parseFloat(f.exit||0),size=parseInt(f.size||1);
-  var pnl=f.side==="LONG"?(exit-entry)*2*size:(entry-exit)*2*size;
+  var pnl=(f.action==="TRADED")?(f.side==="LONG"?(exit-entry)*2*size:(entry-exit)*2*size):0;
+  var stop=parseFloat(f.stop||0);
+  var riskPerTrade=stop>0&&entry>0?Math.abs(entry-stop)*2*size:0;
+  var r_multiple=riskPerTrade>0?pnl/riskPerTrade:null;
   var now=new Date(),d=now.getFullYear()+"-"+(now.getMonth()+1<10?"0":"")+(now.getMonth()+1)+"-"+(now.getDate()<10?"0":"")+now.getDate();
-  state.trades.push({side:f.side,entry:f.entry,exit:f.exit,size:f.size,pnl:pnl,notes:f.notes,date:d});
-  state.tradeForm={side:"LONG",entry:"",exit:"",size:"1",notes:""};
+  state.trades.push({
+    side:f.side, entry:f.entry, exit:f.exit, size:f.size, pnl:pnl, notes:f.notes, date:d,
+    action:f.action||"TRADED", setup_grade:f.setup_grade||"Aplus", regime:f.regime||"CALM",
+    stop:f.stop, t1:f.t1, signal_score_pre:f.signal_score_pre,
+    rules_followed:f.rules_followed||"YES", skip_reason:f.skip_reason,
+    r_multiple:r_multiple
+  });
+  state.tradeForm={side:"LONG",entry:"",exit:"",size:"1",notes:"",action:"TRADED",setup_grade:"Aplus",regime:"CALM",stop:"",t1:"",signal_score_pre:"",rules_followed:"YES",skip_reason:""};
   state.addingTrade=false;
   renderContent();
+}
+
+// -- REFERENCE TAB (PRICES + CHARTS merged) -----------------------------------
+function renderReference(){
+  var html="<div style='font-family:monospace'>";
+  html+="<div style='font-size:9px;color:#00d4aa;font-weight:700;letter-spacing:1px;margin-bottom:10px'>LIVE CHARTS</div>"
+    +"<a href='https://mnq-live-chart-auxqzk2bya5bvb3onyxn7y.streamlit.app/' target='_blank' style='display:block;background:#00ff9f22;border:2px solid #00ff9f66;border-radius:8px;padding:14px;text-align:center;text-decoration:none;margin-bottom:12px'><div style='font-size:12px;color:#00ff9f;font-weight:700;letter-spacing:2px'>OPEN LIVE MNQ CHART</div><div style='font-size:8px;color:#555;margin-top:3px'>Streamlit - Databento feed - enter API key in sidebar</div></a>";
+  CHART_LINKS.forEach(function(l){html+="<a href='"+l.url+"' target='_blank' class='chart-link' style='border:1px solid "+l.color+"33'><div><div style='font-size:10px;color:"+l.color+";font-weight:700'>"+l.label+"</div><div style='font-size:8px;color:#444;margin-top:2px'>"+l.desc+"</div></div><span style='font-size:14px;color:"+l.color+"'>-></span></a>";});
+  html+="</div>";
+  return html;
 }
 
 // -- PRICES TAB ---------------------------------------------------------------
@@ -1023,14 +1049,204 @@ function renderCharts(){
   return html;
 }
 
-// -- SOCIAL TAB ---------------------------------------------------------------
-function renderSocial(){
-  var html="<div style='font-family:monospace'><div style='font-size:9px;color:#1d9bf0;font-weight:700;letter-spacing:1px;margin-bottom:8px'>SOCIAL SIGNALS</div>"
-    +"<div style='background:#ff3d5708;border:1px solid #ff3d5733;border-radius:5px;padding:8px;margin-bottom:10px'><div style='font-size:8px;color:#ff3d57;font-weight:700;margin-bottom:6px'>! HIGH IMPACT ACCOUNTS - CHECK BEFORE EVERY TRADE</div>";
-  BOMBS.forEach(function(b){html+="<a href='https://x.com/"+b.h+"' target='_blank' class='bomb-row'><div style='font-size:10px;color:#ff3d57;font-weight:700;min-width:30px'>@</div><div><div style='font-size:10px;color:#ddd;font-weight:700'>"+b.h+"</div><div style='font-size:7px;color:#ff3d57;font-weight:700;margin-top:1px'>"+b.label+"</div><div style='font-size:8px;color:#444;margin-top:2px'>"+b.why+"</div></div></a>";});
-  html+="</div><div style='font-size:8px;color:#1d9bf0;font-weight:700;letter-spacing:1px;margin-bottom:6px'>NQ TRADERS TO FOLLOW</div>";
-  NQ_TRADERS.forEach(function(t){html+="<a href='https://x.com/"+t.h+"' target='_blank' class='social-row'><div style='font-size:10px;color:#1d9bf0;font-weight:700;min-width:30px'>@</div><div><div style='font-size:10px;color:#ddd;font-weight:700'>"+t.h+"</div><div style='font-size:8px;color:#1d9bf0;font-weight:700;margin-top:1px'>"+t.label+"</div><div style='font-size:8px;color:#444;margin-top:2px'>"+t.why+"</div></div></a>";});
-  html+="</div>";
+// -- ANALYTICS TAB ------------------------------------------------------------
+function renderAnalytics(){
+  var trades = state.trades || [];
+  var traded = trades.filter(function(t){ return (t.action||"TRADED")==="TRADED"; });
+  var totalSessions = trades.length;
+
+  // helpers
+  function fp(v){ return parseFloat(v||0); }
+  function fmt(n){ return (n>=0?"+":"")+n.toFixed(0); }
+  function fmtD(n){ return (n>=0?"$":"−$")+Math.abs(n).toFixed(0); }
+
+  // ---- ADHERENCE DATA ----
+  var adherenceYes = trades.filter(function(t){ return t.rules_followed==="YES"; }).length;
+  var adherenceNo  = trades.filter(function(t){ return t.rules_followed==="NO"; }).length;
+  var tradedCount  = traded.length;
+  var skippedCount = trades.filter(function(t){ return (t.action||"TRADED")==="SKIPPED"; }).length;
+  var adherencePct = totalSessions>0 ? adherenceYes/totalSessions*100 : 0;
+  var adColor = adherencePct>=95?"#00ff9f":adherencePct>=85?"#fbbf24":"#ff3d57";
+  var recentBreaks = trades.filter(function(t){ return t.rules_followed==="NO"; }).slice(-5).reverse();
+
+  // ---- EXPECTANCY DATA ----
+  var GRADES = ["Aplus","B"];
+  var REGIMES = ["CALM","CHOP","ELEVATED"];
+
+  function getBucket(grade, regime){
+    return traded.filter(function(t){
+      var g = t.setup_grade||"Aplus";
+      var r = t.regime||"CALM";
+      var gMatch = grade==="Aplus"?(g==="Aplus"||g==="A+"):g===grade;
+      return gMatch && r===regime;
+    });
+  }
+  function bucketStats(arr){
+    var wins=arr.filter(function(t){return fp(t.pnl)>0;});
+    var loss=arr.filter(function(t){return fp(t.pnl)<0;});
+    var n=arr.length, wr=n?wins.length/n:0;
+    var avgW=wins.length?wins.reduce(function(s,t){return s+fp(t.pnl);},0)/wins.length:0;
+    var avgL=loss.length?Math.abs(loss.reduce(function(s,t){return s+fp(t.pnl);},0)/loss.length):0;
+    var exp=wr*avgW-(1-wr)*avgL;
+    return {n:n,wr:wr,wins:wins.length,loss:loss.length,avgW:avgW,avgL:avgL,exp:exp};
+  }
+
+  // find worst bucket for narrative
+  var worstBucket=null, worstExp=Infinity;
+  GRADES.forEach(function(g){ REGIMES.forEach(function(r){
+    var arr=getBucket(g,r); if(arr.length<5) return;
+    var s=bucketStats(arr); if(s.exp<worstExp){worstExp=s.exp;worstBucket={grade:g,regime:r,stats:s};}
+  });});
+
+  // ---- KELLY DATA ----
+  var tradedWins =traded.filter(function(t){return fp(t.pnl)>0;});
+  var tradedLoss =traded.filter(function(t){return fp(t.pnl)<0;});
+  var W  = traded.length?tradedWins.length/traded.length:0;
+  var aW = tradedWins.length?tradedWins.reduce(function(s,t){return s+fp(t.pnl);},0)/tradedWins.length:0;
+  var aL = tradedLoss.length?Math.abs(tradedLoss.reduce(function(s,t){return s+fp(t.pnl);},0)/tradedLoss.length):1;
+  var R  = aL>0?aW/aL:0;
+  var fK = traded.length>=5&&aL>0?(W-(1-W)/R):0;
+  var hK = fK/2, qK = fK/4;
+  var kDollars = qK*2000;
+  var sugContracts = fK>0?Math.max(1,Math.min(3,Math.floor(kDollars/100))):1;
+  var kellyWarn = traded.length<20||fK<=0;
+  var worstCaseLosers = sugContracts>0?Math.floor(2000/(sugContracts*200)):0;
+
+  // ---- SESSIONS COUNTER ----
+  var sessUntil = Math.max(0, 30-totalSessions);
+
+  var html = "<div style='font-family:monospace'>";
+
+  // sessions counter
+  html += "<div class='anl-counter'>"
+    +"<span style='font-size:8px;color:#fbbf24;font-weight:700;letter-spacing:1px'>SESSIONS UNTIL EDGE CALIBRATION</span>"
+    +"<span style='font-size:20px;font-weight:700;color:#fbbf24'>"+(sessUntil>0?sessUntil:"READY")+"</span>"
+    +"</div>";
+
+  // ====================================================================
+  // SECTION 3 — ADHERENCE (displayed first/largest per spec)
+  // ====================================================================
+  html += "<div class='card'>"
+    +"<div style='font-size:7px;color:#a78bfa;font-weight:700;letter-spacing:2px;margin-bottom:10px'>SECTION 3 — PROCESS ADHERENCE SCORECARD</div>";
+
+  html += "<div class='anl-adherence' style='color:"+adColor+"'>"+adherencePct.toFixed(1)+"%</div>"
+    +"<div class='anl-adherence-lbl' style='color:"+adColor+"'>PROCESS ADHERENCE</div>"
+    +"<div style='font-size:7px;color:#333;text-align:center;margin:4px 0 10px'>A fundable edge requires adherence &ge;95% AND positive expectancy. Win rate is not the goal &mdash; following your own plan is.</div>";
+
+  html += "<div class='grid3' style='margin-bottom:8px'>"
+    +"<div class='stat-box'><div class='stat-lbl'>SESSIONS LOGGED</div><div class='stat-val' style='color:#aaa'>"+totalSessions+"</div></div>"
+    +"<div class='stat-box'><div class='stat-lbl'>TRADED / SKIPPED</div><div class='stat-val'>"+tradedCount+" <span style='color:#444'>/</span> "+skippedCount+"</div></div>"
+    +"<div class='stat-box'><div class='stat-lbl'>RULE BREAKS</div><div class='stat-val' style='color:"+(adherenceNo>0?"#ff3d57":"#00ff9f")+"'>"+adherenceNo+"</div></div>"
+    +"</div>";
+
+  if(recentBreaks.length){
+    html += "<div style='font-size:7px;color:#ff3d57;font-weight:700;letter-spacing:1px;margin-bottom:5px'>RECENT RULE BREAKS (LAST 5)</div>";
+    recentBreaks.forEach(function(t){
+      html += "<div class='anl-rulebreak'>"
+        +"<div style='display:flex;justify-content:space-between'>"
+        +"<span style='font-size:8px;color:#ff3d57;font-weight:700'>"+t.date+"</span>"
+        +"<span style='font-size:7px;color:#555'>"+t.setup_grade+" &bull; "+t.regime+"</span></div>"
+        +(t.skip_reason?"<div style='font-size:8px;color:#fbbf24;margin-top:2px'>"+t.skip_reason+"</div>":"")
+        +(t.notes?"<div style='font-size:8px;color:#444;margin-top:2px;line-height:1.4'>"+t.notes+"</div>":"")
+        +"</div>";
+    });
+  } else if(totalSessions>0){
+    html += "<div style='font-size:8px;color:#00ff9f;text-align:center;padding:8px 0'>No rule breaks logged &mdash; clean record.</div>";
+  } else {
+    html += "<div style='font-size:8px;color:#333;text-align:center;padding:8px 0'>No sessions logged yet.</div>";
+  }
+  html += "</div>";
+
+  // ====================================================================
+  // SECTION 1 — EXPECTANCY ENGINE
+  // ====================================================================
+  html += "<div class='card'>"
+    +"<div style='font-size:7px;color:#00ff9f;font-weight:700;letter-spacing:2px;margin-bottom:8px'>SECTION 1 — EXPECTANCY ENGINE</div>";
+
+  if(traded.length<5){
+    html += "<div style='font-size:9px;color:#333;text-align:center;padding:16px'>Insufficient data &mdash; log at least 5 traded sessions to compute expectancy.</div>";
+  } else {
+    // Overall expectancy line
+    var ov=bucketStats(traded);
+    var ovExp=ov.exp;
+    html += "<div class='card-sm' style='margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;border-color:"+(ovExp>=0?"#00ff9f33":"#ff3d5733")+"'>"
+      +"<span style='font-size:8px;color:#555'>OVERALL EXPECTANCY / TRADE</span>"
+      +"<span style='font-size:14px;font-weight:700;color:"+(ovExp>=0?"#00ff9f":"#ff3d57")+";'>"+fmtD(ovExp)+"</span>"
+      +"</div>"
+      +"<div style='font-size:7px;color:#333;margin-bottom:8px'>Formula: (Win rate &times; Avg Win) &minus; (Loss rate &times; Avg Loss). W="+ov.wr.toFixed(2)+" &middot; AvgW="+fmtD(ov.avgW)+" &middot; AvgL="+fmtD(ov.avgL)+"</div>";
+
+    // Breakdown table
+    html += "<div style='overflow-x:auto'><table class='anl-table'><thead><tr>"
+      +"<th>SETUP \\ REGIME</th><th>CALM</th><th>CHOP</th><th>ELEVATED</th></tr></thead><tbody>";
+
+    GRADES.forEach(function(g){
+      html += "<tr><td style='text-align:left;color:#aaa;font-weight:700;font-size:8px'>"+(g==="Aplus"?"A+ (MA ALIGNED)":"B (NOT ALIGNED)")+"</td>";
+      REGIMES.forEach(function(r){
+        var arr=getBucket(g,r), s=bucketStats(arr);
+        if(arr.length<5){
+          html += "<td class='anl-cell-insuf'><div style='font-size:7px'>"+arr.length+" trades</div><div style='font-size:7px;margin-top:1px'>insufficient data</div></td>";
+        } else {
+          var cls=s.exp>=0?"anl-cell-pos":"anl-cell-neg";
+          var eCol=s.exp>=0?"#00ff9f":"#ff3d57";
+          html += "<td class='"+cls+"'>"
+            +"<div style='font-size:7px;color:#555'>n="+s.n+" &bull; WR "+(s.wr*100).toFixed(0)+"%</div>"
+            +"<div style='font-size:7px;color:#00ff9f;margin-top:2px'>W: "+fmtD(s.avgW)+"</div>"
+            +"<div style='font-size:7px;color:#ff3d57'>L: "+fmtD(s.avgL)+"</div>"
+            +"<div style='font-size:9px;color:"+eCol+";font-weight:700;margin-top:3px'>E: "+fmtD(s.exp)+"</div>"
+            +"</td>";
+        }
+      });
+      html += "</tr>";
+    });
+    html += "</tbody></table></div>";
+
+    if(worstBucket){
+      var wg=worstBucket.grade==="Aplus"?"A+":"B";
+      html += "<div style='background:#ff3d5708;border:1px solid #ff3d5733;border-radius:4px;padding:7px 10px;margin-top:8px;font-size:8px;color:#ff3d57;line-height:1.4'>"
+        +"<b>Worst bucket:</b> "+wg+" setups in "+worstBucket.regime+" regime have negative expectancy ("
+        +fmtD(worstBucket.stats.exp)+" over "+worstBucket.stats.n+" trades) &mdash; stop trading this bucket.</div>";
+    }
+  }
+  html += "</div>";
+
+  // ====================================================================
+  // SECTION 2 — FRACTIONAL KELLY
+  // ====================================================================
+  html += "<div class='card'>"
+    +"<div style='font-size:7px;color:#00d4aa;font-weight:700;letter-spacing:2px;margin-bottom:8px'>SECTION 2 — FRACTIONAL KELLY SIZING</div>";
+
+  if(kellyWarn){
+    html += "<div style='background:#fbbf2408;border:1px solid #fbbf2433;border-radius:5px;padding:10px;font-size:9px;color:#fbbf24;text-align:center;margin-bottom:8px'>"
+      +"<b>Edge not yet established</b> &mdash; trade minimum size (1&ndash;2 contracts) until 20+ sessions logged."
+      +(traded.length<20?"<br><span style='font-size:8px;color:#555'>Currently: "+traded.length+" traded sessions.</span>":"")
+      +(fK<=0&&traded.length>=5?"<br><span style='font-size:8px;color:#ff3d57'>Measured edge is negative (Kelly &lt;0). Review process before sizing up.</span>":"")
+      +"</div>";
+  }
+
+  html += "<div class='grid3' style='margin-bottom:8px'>"
+    +"<div class='anl-kelly'><div style='font-size:7px;color:#555;margin-bottom:4px;letter-spacing:1px'>FULL KELLY</div><div class='anl-kelly-f' style='color:#ff3d57'>"+(fK>0?(fK*100).toFixed(1)+"%":"—")+"</div><div style='font-size:7px;color:#333'>never use</div></div>"
+    +"<div class='anl-kelly'><div style='font-size:7px;color:#555;margin-bottom:4px;letter-spacing:1px'>HALF-KELLY</div><div class='anl-kelly-f' style='color:#fbbf24'>"+(hK>0?(hK*100).toFixed(1)+"%":"—")+"</div><div style='font-size:7px;color:#333'>aggressive</div></div>"
+    +"<div class='anl-kelly'><div style='font-size:7px;color:#555;margin-bottom:4px;letter-spacing:1px'>QUARTER-KELLY</div><div class='anl-kelly-f' style='color:#00ff9f'>"+(qK>0?(qK*100).toFixed(1)+"%":"—")+"</div><div style='font-size:7px;color:#333'>recommended</div></div>"
+    +"</div>";
+
+  html += "<div class='grid2' style='margin-bottom:8px'>"
+    +"<div class='stat-box'><div class='stat-lbl'>WIN RATE (measured)</div><div class='stat-val' style='color:#fbbf24'>"+(traded.length?((W*100).toFixed(1)+"%"):"—")+"</div></div>"
+    +"<div class='stat-box'><div class='stat-lbl'>R RATIO (AvgWin/AvgLoss)</div><div class='stat-val' style='color:#00d4aa'>"+(traded.length>=2&&aL>0?R.toFixed(2):"—")+"</div></div>"
+    +"</div>";
+
+  html += "<div style='background:#00ff9f0a;border:1px solid #00ff9f33;border-radius:5px;padding:10px;margin-bottom:8px;text-align:center'>"
+    +"<div style='font-size:7px;color:#00ff9f;font-weight:700;letter-spacing:1px;margin-bottom:4px'>SUGGESTED CONTRACTS ($50k account &bull; $2k drawdown limit &bull; 50pt stop)</div>"
+    +"<div style='font-size:28px;font-weight:700;color:#00ff9f'>"+sugContracts+"</div>"
+    +"<div style='font-size:7px;color:#555;margin-top:2px'>Quarter-Kelly fraction &times; $2,000 &divide; $100 per contract &bull; hard capped at 3</div>"
+    +"</div>";
+
+  html += "<div class='card-sm'>"
+    +"<div style='font-size:7px;color:#fbbf24;margin-bottom:2px'>CONSECUTIVE LOSS SURVIVAL</div>"
+    +"<div style='font-size:9px;color:#aaa'>Worst-case consecutive losers this account survives at <b>"+sugContracts+" contracts</b>: <span style='color:#fbbf24;font-weight:700'>"+worstCaseLosers+"</span></div>"
+    +"<div style='font-size:7px;color:#333;margin-top:2px'>$2,000 &divide; ("+sugContracts+" &times; $200/contract worst-case)</div>"
+    +"</div>";
+
+  html += "</div></div>";
   return html;
 }
 
@@ -1041,6 +1257,7 @@ function attachHandlers(){}
 setInterval(updateClock,1000);
 updateClock();
 renderMag7();
+renderMacroStrip();
 renderTabs();
 renderMktSwitcher();
 renderContent();
